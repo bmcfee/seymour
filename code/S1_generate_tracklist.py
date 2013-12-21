@@ -53,7 +53,7 @@ def extract_metadata_from_filename(filename, pattern):
     tagdict = dict(title=None, artist=None, album=None, tracknum=-1,
                    compilation=False)
     
-    m = re.match(pattern, filename)
+    m = re.match(unicode(pattern, 'utf-8', errors='ignore'), unicode(filename, 'utf-8', errors='ignore'))
     if m:
         for key, val in m.groupdict().iteritems():
             tagdict[key] = val
@@ -70,7 +70,7 @@ def process_files(filenames, pattern, outfile):
         print >> sys.stderr, 'Processing %s' % filename
         tagdict = extract_metadata_from_filename(filename, pattern)
         tags = ','.join('"%s"' % unicode(tagdict[k]) for k in keys)
-        outfile.write('"%s",%s\n' % (filename, tags))
+        outfile.write('"%s",%s\n' % (unicode(filename, 'utf-8', errors='ignore'), tags))
 
 def main(pattern, outputfilename, files):
     outfile = codecs.open(outputfilename, 'w', encoding='utf-8')
