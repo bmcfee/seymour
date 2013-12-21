@@ -206,7 +206,7 @@ def _read_csv_tags(cwd, csv=None):
             
         # save title, artist, album, tracknum, compilation in tags[<file-name>]
         
-        filepath=line[0]
+        filepath=unicode(line[0], 'utf-8', errors='ignore')
         tags[filepath] = dict() # this deletes previous lines if filepath is repeated ...
         col = 1 # col 0 is 'filepath' so skip it
         while col < len(headers):
