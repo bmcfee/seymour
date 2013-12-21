@@ -1,0 +1,23 @@
+{"load":    {    "sr":           22050}, 
+ 
+ "beat":    {   "hop_length":   64}, 
+ 
+ "mel":     {   "fmax":         8000, 
+                "n_mels":       128}, 
+ 
+ "mfcc":    {   "n_mfcc":       20},
+
+ "chroma":  {   "octwidth":     2, 
+                "ctroct":       5, 
+                "n_fft":        4096}, 
+ 
+ "stft":    {   "hop_length":   512, 
+                "n_fft":        2048}, 
+ 
+ "hpss":    {   "power":        2.0, 
+                "kernel_size":  31}, 
+
+ "cqt":     {   "fmax":         12543.8539514, 
+                "resolution":   2, 
+                "fmin":         8.17579891564}
+}
