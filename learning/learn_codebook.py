@@ -143,6 +143,13 @@ def get_parameters():
                         dest    =   'working_size',
                         help    =   'Maximum number of files to process at once')
 
+    parser.add_argument('-m',
+                        '--max-iter',
+                        type    =   int,
+                        default =   1,
+                        dest    =   'max_iter',
+                        help    =   'Number of passes through the data stream')
+
     parser.add_argument('-n',
                         '--num-samples',
                         type    =   int,
