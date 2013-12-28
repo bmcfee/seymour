@@ -18,7 +18,7 @@ from Whitening import Whitening
 from HartiganOnline import HartiganOnline
 from VectorQuantizer import VectorQuantizer
 
-def extract_features(track_id, widths=[3,7,15]):
+def local_contrast(S, widths=[3,7,15]):
     '''Get local contrast spectrogram features from a track id'''
 
     # Build the local difference mapping
@@ -32,7 +32,6 @@ def extract_features(track_id, widths=[3,7,15]):
         return Xhat
     
     # Get the mel spectrogram, convert to log power
-    S = seymour.get_analysis(track_id)['mel_spectrogram']
     S = librosa.logamplitude(S, ref_power=S.max())
     
     return make_contrast_features(S)
@@ -42,7 +41,8 @@ def feature_stream(track_id, n=50, transform=None):
     Takes a track id, and generates samples of its feature content"""
     
     # Get the features
-    features = extract_features(track_id)
+    features    = local_contrast(seymour.get_analysis(track_id, 
+                                                      'librosa:low-level')['mel_spectrogram'])
     
     if transform is not None:
         features = transform.transform(features.T).T

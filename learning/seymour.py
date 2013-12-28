@@ -14,7 +14,6 @@ def get_collection_tracks(name):
 
     return [t.id for t in C[0].tracks]
 
-
 def get_track(t_id):
     """Get the track object given the id"""
     t = gordon.Track.query.filter(gordon.Track.id==t_id).limit(1)
