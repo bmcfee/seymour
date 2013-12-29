@@ -256,6 +256,12 @@ def create_annotation(track_id, feature_directory, PARAMETERS):
     
     track = gordon.Track.query.get(track_id)
 
+    output_file = os.path.join(feature_directory, get_output_file(track.path))
+
+    if os.path.exists(output_file):
+        print 'Pre-computed: ', output_file
+        return track_id, output_file
+
     print 'Analyzing ', track.path
 
     # Skip it if we've already got it cached
