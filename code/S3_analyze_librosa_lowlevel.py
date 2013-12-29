@@ -230,6 +230,13 @@ def process_arguments():
                             default =   1,
                             help    =   'verbosity')
 
+    parser.add_argument(    '-r',
+                            '--recompute',
+                            dest    =   'recompute',
+                            action  =   'store_true',
+                            default =   False,
+                            help    =   'Force recompute features')
+
     return vars(parser.parse_args(sys.argv[1:]))
 
 def load_parameters(parameter_path):
@@ -252,13 +259,13 @@ def save_analysis(track_path, analysis, feature_directory):
 
     return output_file
 
-def create_annotation(track_id, feature_directory, PARAMETERS):
+def create_annotation(track_id, feature_directory, recompute, PARAMETERS):
     
     track = gordon.Track.query.get(track_id)
 
     output_file = os.path.join(feature_directory, get_output_file(track.path))
 
-    if os.path.exists(output_file):
+    if not recompute and os.path.exists(output_file):
         print 'Pre-computed: ', output_file
         return track_id, output_file
 
@@ -281,7 +288,7 @@ def create_annotation_record(track_id, filename):
         track.annotations.append(gordon.Annotation(name=unicode(ANALYSIS_NAME), value=unicode(filename)))
         gordon.commit()
     
-def main(feature_directory=None, parameter_path=None, num_jobs=None, verbose=1):
+def main(feature_directory=None, parameter_path=None, num_jobs=None, verbose=1, recompute=False):
     
     PARAMETERS = load_parameters(parameter_path)
 
@@ -291,7 +298,7 @@ def main(feature_directory=None, parameter_path=None, num_jobs=None, verbose=1):
             yield track
 
     for (track_id, filename) in Parallel(n_jobs=num_jobs, verbose=verbose)(
-        delayed(create_annotation)(track.id, feature_directory, PARAMETERS) for track in producer()):
+        delayed(create_annotation)(track.id, feature_directory, recompute, PARAMETERS) for track in producer()):
         
         create_annotation_record(track_id, filename)
 
