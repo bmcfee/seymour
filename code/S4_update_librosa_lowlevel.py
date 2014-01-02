@@ -168,7 +168,7 @@ def analyze_audio(input_file, features, analysis=None, PARAMETERS=None):
         analysis['mel_spectrogram'] = analyze_melspec(y, PARAMETERS)
     
     # Get the mfcc's
-    if 'mfcc' in features:
+    if 'mfcc' in features or 'mel_spectrogram' in features:
         analysis['mfcc'] = analyze_mfcc(analysis['mel_spectrogram'], PARAMETERS)
 
     # Do HPSS
