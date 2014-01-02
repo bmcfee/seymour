@@ -200,7 +200,13 @@ def analyze_audio(input_file, features, analysis=None, PARAMETERS=None):
     if 'PREVIOUS' in analysis:
         PREV = analysis['PREVIOUS']
     else:
-        PREV = None
+        PREV = {}
+
+    if 'updated_features' in analysis:
+        PREV['updated_features'] = features
+
+
+    analysis['updated_features'] = features
 
     analysis['PREVIOUS'] = {'PARAMETERS':   analysis['PARAMETERS'], 
                             'ENVIRONMENT':  analysis['ENVIRONMENT'],
