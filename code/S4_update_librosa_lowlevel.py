@@ -141,34 +141,34 @@ def analyze_cqt(y, PARAMETERS):
     
     return CQT
 
-def analyze_audio(input_file, analysis=None, PARAMETERS=None):
+def analyze_audio(input_file, features, analysis=None, PARAMETERS=None):
     '''Full audio analysis'''
     if analysis is None:
         analysis = {}
     
     # Import metadata, if we can
-    if 'metadata' in PARAMETERS['features']:
+    if 'metadata' in features:
         analysis['metadata'] = mutagen.File(input_file, easy=True) or {}
     
     # Load the input file
     y, sr = librosa.load(input_file, **PARAMETERS['load'])
     
     # Compute track duration
-    if 'duration' in PARAMETERS['features']:
+    if 'duration' in features:
         analysis['duration'] = float(len(y)) / sr
     
     # Pre-compute a downsampled time series for vis purposes
-    if 'signal' in PARAMETERS['features']:
+    if 'signal' in features:
         analysis['signal']   = scipy.signal.decimate(y, 
                                                     len(y)/1024, 
                                                     ftype='fir').astype(np.float32)
     
     # Get a mel power spectrogram
-    if 'mel_spectrogram' in PARAMETERS['features']:
+    if 'mel_spectrogram' in features:
         analysis['mel_spectrogram'] = analyze_melspec(y, PARAMETERS)
     
     # Get the mfcc's
-    if 'mfcc' in PARAMETERS['features']:
+    if 'mfcc' in features:
         analysis['mfcc'] = analyze_mfcc(analysis['mel_spectrogram'], PARAMETERS)
 
     # Do HPSS
@@ -178,22 +178,22 @@ def analyze_audio(input_file, analysis=None, PARAMETERS=None):
     del y
     
     # Get beats and tempo
-    if 'beats' in PARAMETERS['features']:
+    if 'beats' in features:
         analysis['tempo'], analysis['beat_times'] = analyze_beat(y_p, PARAMETERS)
     
     # We're done with percussion now
     del y_p
     
     # Get tuning
-    if 'tuning' in PARAMETERS['features']:
+    if 'tuning' in features:
         analysis['tuning'] = analyze_tuning(y_h, PARAMETERS)
     
     # Get the chroma
-    if 'chroma' in PARAMETERS['features']:
+    if 'chroma' in features:
         analysis['chroma'] = analyze_chroma(y_h, PARAMETERS)
     
     # Get the CQT
-    if 'cqt' in PARAMETERS['features']:
+    if 'cqt' in features:
         analysis['cqt']    = analyze_cqt(y_h, PARAMETERS)
     
     # We're done with harmonics now
@@ -284,7 +284,7 @@ def save_analysis(track_path, analysis, feature_directory):
 
     return output_file
 
-def update_annotation(track_id, feature_directory, recompute, PARAMETERS):
+def update_annotation(track_id, feature_directory, features, PARAMETERS):
     
     track = gordon.Track.query.get(track_id)
 
@@ -297,7 +297,7 @@ def update_annotation(track_id, feature_directory, recompute, PARAMETERS):
     print 'Updating ', track.path
     
     analysis = load_analysis(output_file)
-    analysis = analyze_audio(track.fn_audio, analysis=analysis, PARAMETERS=PARAMETERS)
+    analysis = analyze_audio(track.fn_audio, set(features), analysis=analysis, PARAMETERS=PARAMETERS)
 
     filename = save_analysis(track.path, analysis, feature_directory)
     return track_id, filename
@@ -310,7 +310,7 @@ def create_annotation_record(track_id, filename):
         track.annotations.append(gordon.Annotation(name=unicode(ANALYSIS_NAME), value=unicode(filename)))
         gordon.commit()
     
-def main(feature_directory=None, parameter_path=None, num_jobs=None, verbose=1, recompute=False):
+def main(feature_directory=None, parameter_path=None, num_jobs=None, verbose=1, features=None):
     
     PARAMETERS = load_parameters(parameter_path)
 
@@ -320,7 +320,7 @@ def main(feature_directory=None, parameter_path=None, num_jobs=None, verbose=1, 
             yield track
 
     for (track_id, filename) in Parallel(n_jobs=num_jobs, verbose=verbose)(
-        delayed(update_annotation)(track.id, feature_directory, recompute, PARAMETERS) for track in producer()):
+        delayed(update_annotation)(track.id, feature_directory, features, PARAMETERS) for track in producer()):
         pass
 
 if __name__ == '__main__':
