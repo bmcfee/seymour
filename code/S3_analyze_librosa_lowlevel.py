@@ -146,7 +146,10 @@ def analyze_audio(input_file, PARAMETERS):
     analysis = {}
     
     # Import metadata, if we can
-    analysis['metadata'] = dict(mutagen.File(input_file, easy=True)) or {}
+    try:
+        analysis['metadata'] = dict(mutagen.File(input_file, easy=True))
+    except:
+        analysis['metadata'] = {}
     
     # Load the input file
     y, sr = librosa.load(input_file, **PARAMETERS['load'])
