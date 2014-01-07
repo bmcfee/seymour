@@ -161,7 +161,6 @@ def add_track(trackpath, source=str(datetime.date.today()),
     track.collections.append(get_or_create_collection(source))
     commit() # store the annotations
 
-
 def _read_csv_tags(cwd, csv=None):
     '''Reads a csv file containing track metadata and annotations (v 2.0)
     
@@ -321,7 +320,6 @@ def get_or_create_collection(source):
     else:
         return Collection(name=unicode(source))
 
-
 def add_collection_from_csv_file(csvfile, source=str(datetime.date.today()),
                                  prompt_incompletes=False, doit=False,
                                  gordonDir=DEF_GORDON_DIR, fast_import=False,
@@ -359,8 +357,6 @@ def add_collection_from_csv_file(csvfile, source=str(datetime.date.today()),
     
     print 'Finished'
 
-
-
 def _die_with_usage() :
     print 'This program imports a set of tracks (and their corresponding metdata) listed in a csv file into the database'
     print 'Usage: '
@@ -375,7 +371,6 @@ def _die_with_usage() :
     print '  <metadata> (default 0) use 1 to import all metadata tags from the file'
     print 'More options are available by using the function add_collection()'
     sys.exit(0)
-
 
 def process_arguments():
     parser = argparse.ArgumentParser(description='Gordon audio intake from track list')
