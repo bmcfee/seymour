@@ -44,7 +44,7 @@ from gordon.io.mp3_eyeD3 import isValidMP3, getAllTags
 log = logging.getLogger('gordon.audio_intake_from_tracklist')
 
 def add_track(trackpath, source=str(datetime.date.today()),
-              gordonDir=DEF_GORDON_DIR, tag_dict=dict(), artist=None,
+              gordonDir=DEF_GORDON_DIR, tag_dict=None, artist=None,
               album=None, fast_import=False, import_md=False):
     """Add track with given filename <trackpath> to database
     
@@ -58,6 +58,9 @@ def add_track(trackpath, source=str(datetime.date.today()),
     """
     (path, filename) = os.path.split(trackpath) 
     (fname, ext) = os.path.splitext(filename)
+
+    if tag_dict is None:
+        tag_dict = {}
 
     log.debug('Adding file "%s" of "%s" album by %s', filename, album, artist)
     
