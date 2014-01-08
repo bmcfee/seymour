@@ -30,7 +30,9 @@ def main():
     # Then tracks
     print 'Correcting tracks...'
     for track in gordon.Track.query.all():
-        track.title = normalize(track.title)
+        track.artist    = normalize(track.artist)
+        track.album     = normalize(track.album)
+        track.title     = normalize(track.title)
 
     print 'Done.'
     gordon.commit()
