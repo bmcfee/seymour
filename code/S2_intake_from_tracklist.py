@@ -353,7 +353,13 @@ def add_collection_from_csv_file(csvfile, source=str(datetime.date.today()),
                     print '    %s: %s' % (key, strvalue)
                 ntracks += 1
         else:
-            add_album(albumname, tracks, source, gordonDir, prompt_incompletes, fast_import)
+            add_album(  albumname, 
+                        tracks, 
+                        source=source, 
+                        gordonDir=gordonDir, 
+                        prompt_aname=prompt_incompletes, 
+                        import_md=import_md,
+                        fast_import=fast_import)
     
     print 'Finished'
 
