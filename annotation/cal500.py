@@ -75,7 +75,6 @@ def build_index(data_dir=None, annotation_dir=None, output_file=None, audio_ext=
     annotation_dir = os.path.abspath(annotation_dir)
 
     audio_files = librosa.util.get_audio_files(os.path.join(data_dir, 'mp3'), ext=audio_ext)
-    print audio_files
     annotations = load_annotations(data_dir)
 
     save_annotations(annotation_dir, audio_files, annotations)
