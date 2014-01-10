@@ -47,36 +47,44 @@ Author: Ron Weiss <ronw@nyu.edu>
 import codecs
 import re
 import sys
-import csv
 
 def extract_metadata_from_filename(filename, pattern):
     tagdict = dict(title=None, artist=None, album=None, tracknum=-1,
                    compilation=False)
     
-    m = re.match(unicode(pattern, 'utf-8', errors='ignore'), unicode(filename, 'utf-8', errors='ignore'))
+    m = re.match(unicode(pattern, 'utf-8', errors='strict'), unicode(filename, 'utf-8', errors='strict'))
     if m:
         for key, val in m.groupdict().iteritems():
             tagdict[key] = val
 
     return tagdict
 
+def escape(values):
+
+    esc_v = []
+    for v in values:
+        esc_v.append('"%s"' % v.replace('"', '\\"'))
+
+    return esc_v
+
 def process_files(filenames, pattern, outfile):
     keys = ('title', 'artist', 'album', 'tracknum', 'compilation')
-    outfile.write('# Header:\nfilepath,%s\n' % ','.join(keys))
-    outfile.write('# Extracting metadata using regular expression: %s\n'
+    outfile.write(u'# Header:\nfilepath,%s\n' % ','.join(keys))
+    outfile.write(u'# Extracting metadata using regular expression: %s\n'
                   % pattern)
-    outfile.write('# Tracklist:\n')
-
-    writer = csv.writer(outfile, delimiter=',')
+    outfile.write(u'# Tracklist:\n')
 
     for filename in filenames:
         print >> sys.stderr, 'Processing %s' % filename
 
         tagdict = extract_metadata_from_filename(filename, pattern)
-        values  = [unicode(filename, 'utf-8', errors='ignore')]
+        values  = [unicode(filename, 'utf-8', errors='strict')]
         values.extend([unicode(tagdict[k]) for k in keys])
 
-        writer.writerow(values)
+        # Escape everything
+        values  = escape(values)
+
+        outfile.write('%s\n' % (','.join(values)))
 
 def main(pattern, outputfilename, files):
     outfile = codecs.open(outputfilename, 'w', encoding='utf-8')
