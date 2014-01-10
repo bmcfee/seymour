@@ -47,7 +47,7 @@ Author: Ron Weiss <ronw@nyu.edu>
 import codecs
 import re
 import sys
-
+import csv
 
 def extract_metadata_from_filename(filename, pattern):
     tagdict = dict(title=None, artist=None, album=None, tracknum=-1,
@@ -66,17 +66,22 @@ def process_files(filenames, pattern, outfile):
     outfile.write('# Extracting metadata using regular expression: %s\n'
                   % pattern)
     outfile.write('# Tracklist:\n')
+
+    writer = csv.writer(outfile, delimiter=',')
+
     for filename in filenames:
         print >> sys.stderr, 'Processing %s' % filename
+
         tagdict = extract_metadata_from_filename(filename, pattern)
-        tags = ','.join('"%s"' % unicode(tagdict[k]) for k in keys)
-        outfile.write('"%s",%s\n' % (unicode(filename, 'utf-8', errors='ignore'), tags))
+        values  = [unicode(filename, 'utf-8', errors='ignore')]
+        values.extend([unicode(tagdict[k]) for k in keys])
+
+        writer.writerow(values)
 
 def main(pattern, outputfilename, files):
     outfile = codecs.open(outputfilename, 'w', encoding='utf-8')
     outfile.write('# -*- coding: UTF-8 -*-\n')
     files = process_files(files, pattern, outfile)
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
