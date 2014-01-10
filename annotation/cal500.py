@@ -77,10 +77,8 @@ def build_index(data_dir=None, annotation_dir=None, output_file=None, audio_ext=
     audio_files = librosa.util.get_audio_files(os.path.join(data_dir, 'mp3'), ext=audio_ext)
     annotations = load_annotations(data_dir)
 
-    save_annotations(annotation_dir, audio_files, annotations)
-
     # Store the annotations as json files
-    ann_files   = librosa.util.get_audio_files(annotation_dir, ext='json')
+    ann_files   = save_annotations(annotation_dir, audio_files, annotations)
 
     if len(audio_files) != len(ann_files):
         raise Exception('Audio and annotations do not have the same number of files')
