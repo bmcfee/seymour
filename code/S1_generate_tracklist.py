@@ -74,7 +74,7 @@ def process_files(filenames, pattern, outfile):
 
         tagdict = extract_metadata_from_filename(filename, pattern)
         values  = [unicode(filename, 'utf-8', errors='ignore')]
-        values.extend([unicode(tagdict[k]) for k in keys])
+        values.extend([unicode(tagdict[k], errors='ignore') for k in keys])
 
         writer.writerow(values)
 
