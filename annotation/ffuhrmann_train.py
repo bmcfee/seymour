@@ -10,7 +10,7 @@ import librosa
 import ujson as json
 
 def parse_arguments():
-    parser  =   argparse.ArgumentParser(description='Build an index of cal500 filenames to annotations')
+    parser  =   argparse.ArgumentParser(description='Build an index of ffuhrmann filenames to annotations')
 
     parser.add_argument('-e',
                         '--audio-extension',
