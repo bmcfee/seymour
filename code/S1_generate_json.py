@@ -1,50 +1,8 @@
 #!/usr/bin/env python
+# CHANGED:2014-01-10 22:36:21 by Brian McFee <brm2132@columbia.edu>
+#  adapted from the CSV intake script by Ron Weiss
 
-"""Generates a tracklist file for use by gordon's audio_intake scripts
-
-Usage:  generate_tracklist_from_regexp <pattern> <outputfilename> file1 file2 ...
-
-Extracts metadata from each of the given filenames using the specified
-regexp pattern to generate a tracklist.  The pattern must name
-matching groups with the names "artist", "album", "title", "tracknum",
-or "compilation" to fill in the corresponding track metadata fields.
-
-For example, the pattern:
-'.*/(?P<artist>.*)-(?P<album>.*)-(?P<tracknum>[0-9]*)-(?P<title>.*)\.'
-will match filenames of the form:
-/path/to/artist name-album name-track number-title.mp3
-
-For more information about Python regular expressions, see the
-documentation for the re module at http://docs.python.org/library/re.html
-
-Note that this script *does not* support gordon annotations.  You must
-add them to the generated tracklist manually using e.g. sed.
-
-
-Example Usage:
-
-generate_tracklist_from_regexp \
-    '.*/audio/(?P<artist>The Beatles)/.*_-_(?P<album>.*)/(?P<tracknum>[0-9]*)_-_(?P<title>.*)\.' \
-    tracklist.csv \
-    ~/data/beatles/audio/The\ Beatles/*/*wav
-
-creates tracklist.csv:
-
-# Header:
-filepath,title,artist,album,tracknum,compilation
-# Extracting metadata using regular expression: .*/audio/(?P<artist>The Beatles)/.*_-_(?P<album>.*)/(?P<tracknum>[0-9]*)_-_(?P<title>.*)\.
-# Tracklist:
-/home/ronw/data/beatles/audio/The Beatles/01_-_Please_Please_Me/01_-_I_Saw_Her_Standing_There.wav,I_Saw_Her_Standing_There,The Beatles,Please_Please_Me,01,False
-/home/ronw/data/beatles/audio/The Beatles/01_-_Please_Please_Me/02_-_Misery.wav,Misery,The Beatles,Please_Please_Me,02,False
-/home/ronw/data/beatles/audio/The Beatles/01_-_Please_Please_Me/03_-_Anna_(Go_To_Him).wav,Anna_(Go_To_Him),The Beatles,Please_Please_Me,03,False
-...
-/home/ronw/data/beatles/audio/The Beatles/12_-_Let_It_Be/11_-_For_You_Blue.wav,For_You_Blue,The Beatles,Let_It_Be,11,False
-/home/ronw/data/beatles/audio/The Beatles/12_-_Let_It_Be/12_-_Get_Back.wav,Get_Back,The Beatles,Let_It_Be,12,False
-
-Author: Ron Weiss <ronw@nyu.edu>
-"""
-
-import codecs
+import argparse
 import re
 import sys
 import ujson as json
@@ -60,7 +18,7 @@ def extract_metadata_from_filename(filename, pattern):
 
     return tagdict
 
-def process_files(filenames, pattern, outfile):
+def main(pattern=None, output_filename=None, filenames=None):
     keys = ('title', 'artist', 'album', 'tracknum', 'compilation')
 
     data = []
@@ -75,17 +33,51 @@ def process_files(filenames, pattern, outfile):
 
         data.append(record)
 
-    json.dump(data, outfile)
+    with open(output_filename, 'w') as f:
+        json.dump(data, f)
     
-def main(pattern, outputfilename, files):
-    outfile = codecs.open(outputfilename, 'w', encoding='utf-8')
-    files = process_files(files, pattern, outfile)
+def process_arguments():
 
-# FIXME:  2014-01-10 21:04:04 by Brian McFee <brm2132@columbia.edu>
-# update with argparse 
+    usage = """Extracts metadata from each of the given filenames using the specified
+        regexp pattern to generate a tracklist.  The pattern must name
+        matching groups with the names "artist", "album", "title", "tracknum",
+        or "compilation" to fill in the corresponding track metadata fields.
+        
+        For example, the pattern:
+        '.*/(?P<artist>.*)-(?P<album>.*)-(?P<tracknum>[0-9]*)-(?P<title>.*)\.'
+        will match filenames of the form:
+        /path/to/artist name-album name-track number-title.mp3
+        
+        Note that this script *does not* support gordon annotations.  You must
+        add them to the generated tracklist manually using e.g. sed.
+        
+        Example Usage:
+        
+        %(prog)s \\
+            '.*/audio/(?P<artist>The Beatles)/.*_-_(?P<album>.*)/(?P<tracknum>[0-9]*)_-_(?P<title>.*)\.' \\
+            tracklist.json \\
+            ~/data/beatles/audio/The\ Beatles/*/*wav
+        
+        creates tracklist.json
+        """
+
+    parser = argparse.ArgumentParser(description='Generate a gordon intake file', 
+                                     usage=usage)
+    
+    parser.add_argument('pattern',
+                        action  =   'store',
+                        help    =   'Regular expression to match')
+
+    parser.add_argument('output_filename',
+                        action  =   'store',
+                        help    =   'Path to store the intake file (json)')
+
+    parser.add_argument('filenames',
+                        action  =   'store',
+                        nargs   =   '+',
+                        help    =   'One or more files to intake')
+    
+    return vars(parser.parse_args(sys.argv[1:]))
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print __doc__
-        sys.exit(0)
-    main(sys.argv[1], sys.argv[2], sys.argv[3:])
+    main(**process_arguments())
