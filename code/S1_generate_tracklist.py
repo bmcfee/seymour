@@ -63,7 +63,7 @@ def escape(values):
 
     esc_v = []
     for v in values:
-        esc_v.append('"%s"' % v.replace('"', '\\"'))
+        esc_v.append('"%s"' % v.replace('"', '""'))
 
     return esc_v
 
