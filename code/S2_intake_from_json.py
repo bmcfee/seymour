@@ -79,11 +79,14 @@ def add_track(trackpath, source=str(datetime.date.today()),
     if not os.path.isfile(trackpath):
         log.info('Skipping %s because it is not a file', filename)
         return -1 # not a file
-    try:
-        AudioFile(trackpath).read(tlen_sec=0.01)
-    except:
-        log.error('Skipping "%s" because it is not a valid audio file', filename)
-        return -1 # not an audio file
+
+# FIXME:  2014-01-10 21:42:48 by Brian McFee <brm2132@columbia.edu>
+#  gordon's AudioFile code doesn't handle unicode filenames correctly
+#     try:
+#         AudioFile(trackpath).read(tlen_sec=0.01)
+#     except:
+#         log.error('Skipping "%s" because it is not a valid audio file', filename)
+#         return -1 # not an audio file
 
     # required data
     bytes = os.stat(trackpath)[stat.ST_SIZE]
@@ -98,8 +101,8 @@ def add_track(trackpath, source=str(datetime.date.today()),
 
     # First look for dupes
     if track_exists(fn_recoded, bytes):
-        log.debug('Skipping file "%s", already exists', fn_recoded)
-        return
+        log.debug('Skipping "%s" because it has already been indexed', filename)
+        return -1 # Already exists
 
     # prepare data
     
@@ -172,6 +175,7 @@ def add_track(trackpath, source=str(datetime.date.today()),
     # Link the track to the collection object
     track.collections.append(get_or_create_collection(source))
     commit() # store the annotations
+    log.debug('Added "%s"', trackpath)
 
 def _read_json(cwd, csv=None):
     '''Reads a csv file containing track metadata and annotations (v 2.0)
@@ -282,7 +286,6 @@ def add_album(album_name, tags_dicts, source=str(datetime.date.today()),
         add_track(filename, source=source, gordonDir=gordonDir, tag_dict=tags_dicts[filename],
                   artist=artist_dict[tags_dicts[filename][u'artist']], album=albumrec,
                   fast_import=fast_import, import_md=import_md)
-        log.debug('Added "%s"', filename)
 
     #now update our track counts
     for aname, artist in artist_dict.iteritems() :
