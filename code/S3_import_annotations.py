@@ -11,6 +11,10 @@ import gordon
 
 def load_annotation_index(annotation_index):
     
+    #     FIXME:  2014-01-11 09:59:52 by Brian McFee <brm2132@columbia.edu>
+    # make sure this works with unicode    
+    # match the string processing to the intake function
+
     mapping = {}
     with open(annotation_index, 'r') as f:
         for line in f:
@@ -56,6 +60,10 @@ annotation_index=None, no_commit=False):
     mapping = load_annotation_index(annotation_index)
 
     for t in tracks:
+        if t.ofilename not in mapping:
+            print 'Skipping [%s], not in annotation set' % t.ofilename
+            continue
+
         annotation  = mapping[t.ofilename]
         output_file = os.path.join(annotation_directory, get_output_file(t.path))
 
