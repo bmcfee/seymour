@@ -7,7 +7,7 @@ import cPickle as pickle
 def get_collection_tracks(name):
     """Get all the tracks matching the given collection name"""
 
-    C = gordon.Collection.query.filter(gordon.Collection.name==name).limit(1)
+    C = gordon.Collection.query.filter_by(name=name).limit(1)
     C = C.all()
     if len(C) == 0:
         return []
@@ -16,10 +16,7 @@ def get_collection_tracks(name):
 
 def get_track(t_id):
     """Get the track object given the id"""
-    t = gordon.Track.query.filter(gordon.Track.id==t_id).limit(1)
-    t = t.all()
-    return t[0]
-
+    return gordon.Track.query.get(t_id)
 
 def get_analysis(track_id, analysis='librosa:low-level'):
     '''get the analysis data for a track by id'''
