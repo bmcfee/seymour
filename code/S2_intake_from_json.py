@@ -43,10 +43,10 @@ from gordon.io.mp3_eyeD3 import isValidMP3, getAllTags
 
 log = logging.getLogger('gordon.audio_intake_from_json')
 
-def track_exists(fn_recoded, bytes):
+def track_exists(filename, bytes):
     '''Check to see if a track already exists, using the filename and size'''
 
-    T = Track.query.filter_by(ofilename=fn_recoded, bytes=bytes)
+    T = Track.query.filter_by(ofilename=filename, bytes=bytes)
     return T.count() > 0
 
 def add_track(trackpath, source=str(datetime.date.today()),
@@ -91,18 +91,8 @@ def add_track(trackpath, source=str(datetime.date.today()),
     # required data
     bytes = os.stat(trackpath)[stat.ST_SIZE]
 
-    # FIXME:  2014-01-13 15:14:39 by Brian McFee <brm2132@columbia.edu>
-    #  gaaaaah fn_recoded = 'unknown'?!  this is very wrong.
-    # reencode name to latin1 !!!
-    try:
-        fn_recoded = filename.decode('utf-8')
-    except:
-        try: fn_recoded = filename.decode('latin1')
-        except: fn_recoded = 'unknown'
-
-
     # First look for dupes
-    if track_exists(fn_recoded, bytes):
+    if track_exists(filename, bytes):
         log.debug('Skipping "%s" because it has already been indexed', filename)
         return -1 # Already exists
 
@@ -120,7 +110,7 @@ def add_track(trackpath, source=str(datetime.date.today()),
                   oartist = tag_dict[u'artist'],
                   oalbum = tag_dict[u'album'],
                   otracknum = tag_dict[u'tracknum'],
-                  ofilename = fn_recoded,
+                  ofilename = filename,
                   source = unicode(source),
                   bytes = bytes)
     

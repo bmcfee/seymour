@@ -16,20 +16,10 @@ def load_annotation_index(annotation_index):
     mapping = {}
     with open(annotation_index, 'r') as f:
         for line in f:
-            aud_f, beat_f = line.strip().split('\t', 2)
+            aud_f, ann_f = line.strip().split('\t', 2)
             aud_f = os.path.basename(aud_f)
 
-            # FIXME:  2014-01-13 15:14:54 by Brian McFee <brm2132@columbia.edu>
-            #  actually, the intake script should change to match this, not the other
-            #  way
-            # latin1 re-encoding to match intake script
-            try:
-                aud_f = aud_f.decode('utf-8')
-            except:
-                try: aud_f.decode('latin1')
-                except: aud_f = 'unknown'
-
-            mapping[os.path.basename(aud_f)] = beat_f
+            mapping[aud_f] = ann_f
 
     return mapping
 
