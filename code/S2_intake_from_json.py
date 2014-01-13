@@ -91,6 +91,8 @@ def add_track(trackpath, source=str(datetime.date.today()),
     # required data
     bytes = os.stat(trackpath)[stat.ST_SIZE]
 
+    # FIXME:  2014-01-13 15:14:39 by Brian McFee <brm2132@columbia.edu>
+    #  gaaaaah fn_recoded = 'unknown'?!  this is very wrong.
     # reencode name to latin1 !!!
     try:
         fn_recoded = filename.decode('utf-8')
