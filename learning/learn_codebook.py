@@ -14,11 +14,11 @@ import seymour
 # Whitening, Hartigan, and VQ are all sklearn modules for whitening transformations, 
 # online clustering, and vector quantization
 import learn_ooc
-from Whitening import Whitening
-from HartiganOnline import HartiganOnline
-from VectorQuantizer import VectorQuantizer
+from Whitening          import Whitening
+from HartiganOnline     import HartiganOnline
+from VectorQuantizer    import VectorQuantizer
 
-def local_contrast(S, widths=[3,7,15]):
+def local_contrast(S, widths=None):
     '''Get local contrast spectrogram features from a track id'''
 
     # Build the local difference mapping
@@ -31,10 +31,13 @@ def local_contrast(S, widths=[3,7,15]):
         
         return Xhat
     
+    if widths is None:
+        widths = []
+
     # Get the mel spectrogram, convert to log power
     S = librosa.logamplitude(S, ref_power=S.max())
     
-    return make_contrast_features(S)
+    return make_contrast_features(S, widths=widths)
 
 def feature_stream(track_id, n=50, transform=None):
     """The datastream object's feature generator. 
