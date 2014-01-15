@@ -121,7 +121,7 @@ def analyze_beat(y, PARAMETERS):
                                         sr=PARAMETERS['load']['sr'], 
                                         hop_length=PARAMETERS['beat']['hop_length'])
     
-    return tempo, beat_times
+    return tempo, beat_times, odf
     
 def analyze_chroma(y, PARAMETERS):
     '''STFT-chromagram'''
@@ -182,7 +182,7 @@ def analyze_audio(input_file, features, analysis=None, PARAMETERS=None):
     
     # Get beats and tempo
     if 'beats' in features:
-        analysis['tempo'], analysis['beat_times'] = analyze_beat(y_p, PARAMETERS)
+        analysis['tempo'], analysis['beat_times'], analysis['onset_strength'] = analyze_beat(y_p, PARAMETERS)
     
     # We're done with percussion now
     del y_p
