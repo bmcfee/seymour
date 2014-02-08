@@ -17,7 +17,7 @@
  "hpss":    {   "power":        2.0, 
                 "kernel_size":  31}, 
 
- "cqt":     {   "fmax":         12543.8539514, 
+ "cqt":     {   "n_bins":       128, 
                 "resolution":   2, 
                 "fmin":         8.17579891564}
 }

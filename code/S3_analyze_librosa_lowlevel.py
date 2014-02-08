@@ -83,18 +83,11 @@ def analyze_mfcc(S, PARAMETERS):
                              n_mfcc=PARAMETERS['mfcc']['n_mfcc'])
     return M
 
-
 def analyze_tuning(y, PARAMETERS):
     '''Estimate tuning'''
-    pitches, magnitudes = librosa.feature.ifptrack(y, 
-                                                   sr=PARAMETERS['load']['sr'],
-                                                   n_fft=PARAMETERS['stft']['n_fft'],
-                                                   hop_length=PARAMETERS['stft']['hop_length'])[:2]
-    pitches = pitches[magnitudes > np.median(magnitudes)]
-    
-    tuning = librosa.feature.estimate_tuning(pitches)
-    
-    return tuning
+    return librosa.feature.estimate_tuning( y=y, 
+                                            sr=PARAMETERS['load']['sr'], 
+                                            n_fft=PARAMETERS['stft']['n_fft'])
 
 def analyze_beat(y, PARAMETERS):
     '''Estimate beat times and tempo'''
@@ -114,8 +107,7 @@ def analyze_beat(y, PARAMETERS):
     # Get beats
     tempo, beats = librosa.beat.beat_track(onsets=odf, 
                                            sr=PARAMETERS['load']['sr'], 
-                                           hop_length=PARAMETERS['beat']['hop_length'], 
-                                           n_fft=PARAMETERS['stft']['n_fft'])
+                                           hop_length=PARAMETERS['beat']['hop_length'])
       
     beat_times = librosa.frames_to_time(beats, 
                                         sr=PARAMETERS['load']['sr'], 
@@ -133,11 +125,11 @@ def analyze_chroma(y, PARAMETERS):
     return C
     
 def analyze_cqt(y, PARAMETERS):
-    '''Constant-Q transform'''
-    CQT = librosa.cqt(y, 
-                      PARAMETERS['load']['sr'],
+    '''Constant-Q transform, energy-only'''
+    CQT = np.abs(librosa.cqt(y, 
+                      sr=PARAMETERS['load']['sr'],
                       hop_length=PARAMETERS['stft']['hop_length'], 
-                      **PARAMETERS['cqt']).astype(np.float32)
+                      **PARAMETERS['cqt']))
     
     return CQT
 

@@ -3,7 +3,6 @@
 # CREATED:2014-01-02 13:07:49 by Brian McFee <brm2132@columbia.edu>
 # revise/recompute existing feature analysis 
 
-
 import numpy as np
 import scipy.signal
 import librosa
