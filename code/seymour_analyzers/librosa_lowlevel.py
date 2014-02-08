@@ -158,7 +158,7 @@ def analyze_audio(input_file, features=None, analysis=None, PARAMETERS=None):
     
     # Pre-compute a downsampled time series for vis purposes
     if 'signal' in features:
-        analysis['signal']   = scipy.signal.decimate(y, len(y)/1024).astype(np.float32)
+        analysis['signal']   = scipy.signal.decimate(y, len(y)/1024, ftype='fir').astype(np.float32)
     
     # Get a mel power spectrogram
     if 'mel_spectrogram' in features:
