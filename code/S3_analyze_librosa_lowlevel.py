@@ -98,7 +98,7 @@ def create_annotation(track_id, feature_directory, recompute, PARAMETERS):
     print 'Analyzing ', track.path
 
     # Skip it if we've already got it cached
-    if ANALYSIS_NAME in track.annotation_dict:
+    if not recompute and ANALYSIS_NAME in track.annotation_dict:
         return track_id, track.annotation_dict[ANALYSIS_NAME]
 
     analysis = librosa_lowlevel.analyze_audio(track.fn_audio, PARAMETERS=PARAMETERS)
