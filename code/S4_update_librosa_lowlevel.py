@@ -30,7 +30,7 @@ def get_git_revision(filename):
     If the file is not under any git repository, returns ''.
     '''
     
-    filename = os.path.abspath(filename)
+    filename = os.path.realpath(filename)
 
     while filename != '/':
         try:
