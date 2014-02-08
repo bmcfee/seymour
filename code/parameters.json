@@ -19,5 +19,5 @@
 
  "cqt":     {   "n_bins":       84, 
                 "resolution":   2, 
-                "fmin":         32.70319566 } // midi #24
+                "fmin":         32.70319566 } 
 }
