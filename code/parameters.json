@@ -17,7 +17,7 @@
  "hpss":    {   "power":        2.0, 
                 "kernel_size":  31}, 
 
- "cqt":     {   "n_bins":       128, 
+ "cqt":     {   "n_bins":       84, 
                 "resolution":   2, 
-                "fmin":         8.17579891564}
+                "fmin":         32.70319566 } // midi #24
 }
