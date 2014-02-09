@@ -37,7 +37,7 @@ def process_arguments():
                             dest    =   'parameter_path',
                             action  =   'store',
                             type    =   str,
-                            default =   './parameters.json',
+                            default =   './parameters-lowlevel.json',
                             help    =   'path to parameters json object')
 
     parser.add_argument(    '-j',
