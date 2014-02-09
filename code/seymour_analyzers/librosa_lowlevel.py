@@ -105,6 +105,18 @@ def get_beat(y, PARAMETERS):
     
     return tempo, beat_times, odf
     
+def get_onsets(odf, PARAMETERS):
+    '''Estimate onset times'''
+    onset_frames = librosa.onset.onset_detect(onset_envelope=odf, 
+                                              sr=PARAMETERS['load']['sr'], 
+                                              hop_length=PARAMETERS['beat']['hop_length'])
+
+    onset_times  = librosa.frames_to_time(onset_frames, 
+                                          sr=PARAMETERS['load']['sr'], 
+                                          hop_length=PARAMETERS['beat']['hop_length'])
+
+    return onset_times
+
 def get_chroma(y, PARAMETERS):
     '''STFT-chromagram'''
     C = librosa.feature.chromagram(y=y, 
@@ -130,6 +142,7 @@ def get_feature_names():
             'mel_spectrogram', 
             'mfcc', 
             'beats', 
+            'onsets',
             'tuning', 
             'chroma', 
             'cqt']
@@ -178,6 +191,9 @@ def analyze_audio(input_file, features=None, analysis=None, PARAMETERS=None):
     if 'beats' in features:
         analysis['tempo'], analysis['beat_times'], analysis['onset_strength'] = get_beat(y_p, PARAMETERS)
     
+    if 'onsets' in features:
+        analysis['onsets'] = get_onsets(analysis['onset_strength'], PARAMETERS)
+
     # We're done with percussion now
     del y_p
     

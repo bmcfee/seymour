@@ -35,6 +35,8 @@ def process_arguments():
     parser.add_argument(    'features',
                             nargs   =   '+',
                             action  =   'store',
+                            type    =   str,
+                            choices =   librosa_lowlevel.get_feature_names(),
                             help    =   'features to update')
 
     parser.add_argument(    '-p',
