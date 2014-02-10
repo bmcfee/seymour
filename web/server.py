@@ -60,7 +60,7 @@ def get_tracks(collection_id, offset, limit):
 
     return json.encode(data_layer.get_tracks(collection_id, offset=offset, limit=limit))
 
-@app.route('/', methods=['GET'], defaults={'collection_id': 1})
+@app.route('/', methods=['GET'], defaults={'collection_id': 3})
 @app.route('/<int:collection_id>')
 def index(collection_id):
     '''Top-level web page'''

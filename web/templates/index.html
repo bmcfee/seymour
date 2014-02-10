@@ -17,11 +17,15 @@
             }
 
             li.track {
+                position: relative;
                 margin:         8px;
                 padding:        4px;
-                width:          25%;
+                width:          20%;
                 text-align:     justify;
                 border-radius:  0px !important; // disable rounded corners
+            }
+            li:hover.track {
+                background: #9ecae1;
             }
         </style>
     </head>
@@ -48,16 +52,13 @@
             </div>
         </nav>
 
-        <div class="container">
+        <div class="col-md-12">
             <div class="panel panel-default">
-                <div class="panel-body">
-                    <ul id="tracklist" class="list-inline"></ul>
-                </div>
-                <div class="panel-footer">
+                <div class="panel-heading">
                     <input type="hidden" id="offset" />
                     <input type="hidden" id="limit" />
                     <input type="hidden" id="track_count" />
-                    <input type="hidden" id="collection_id" />
+                    <input type="hidden" id="collection_id" value="{{ collection_id }}" />
                     <ul class="pager">
                         <li class="previous"><a href="#">Previous</a></li>
                         <li>
@@ -68,6 +69,9 @@
 
                         <li class="next"><a href="#">Next</a></li>
                     </ul>
+                </div>
+                <div class="panel-body">
+                    <ul id="tracklist" class="list-inline"></ul>
                 </div>
             </div>
         </div>

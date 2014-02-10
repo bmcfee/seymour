@@ -4,6 +4,10 @@ $(document).ready(function() {
 //     search_graph($('#seed_id').val(), $('#depth').val());
     // Query for the collections list
     $.ajax({ url: '/collections', dataType: 'json'}).done(update_collections);
+
+    // Set the default and update the pager
+    var collection_id   = parseInt($('#collection_id').val());
+    get_collection(collection_id, 0, 15);
 });
 
 function dv(x, v) {
@@ -24,7 +28,11 @@ function update_collections(collections) {
     for (var c in collections) {
         var li = $('<li role="presentation">');
     
-        var button = $('<button type="button" class="btn btn-link"></button>');
+        var button = $('<button type="button">')
+                            .addClass('btn')
+                            .addClass('btn-link')
+                            .addClass('btn-block');
+
         button.text(collections[c].name);
         var hidden = $('<input type="hidden">');
         hidden.val(collections[c].collection_id);
@@ -36,12 +44,16 @@ function update_collections(collections) {
 
             get_collection($(hidden).val(), 0, 15);
         });
+        
+        var badge = $('<span>').addClass('badge').addClass('pull-right');
+
+        badge.text(collections[c].track_count);
+
+        button.append(badge);
         li.append(button);
         menu.append(li);
     }
 
-    // Set the default and update the pager
-    get_collection(collections[0].collection_id, 0, 15);
 }
 
 
@@ -100,11 +112,15 @@ function get_collection(collection_id, offset, limit) {
             for (var i in tracklist) {
                 var li = $('<li></li>').addClass('list-group-item').addClass('track');
                 
+                var ctext = tracklist[i].artist;
+                if (tracklist[i].album.length > 0) {
+                    ctext += ' - ' + tracklist[i].album;
+                }
                 var content = $('<div></div>');
                 content.append($('<h4></h4>').text(tracklist[i].title));
                 content.append($('<h5></h5>')
                         .addClass('text-muted')
-                        .text(tracklist[i].artist + ' - ' + tracklist[i].album));
+                        .text(ctext));
                 
                 var hidden = $('<input type="hidden">').val(tracklist[i].track_id);
                 li.append(hidden);
@@ -112,7 +128,6 @@ function get_collection(collection_id, offset, limit) {
 
                 li.click(function() {
                     var hid = $($(this).find('input:hidden')[0]);
-//                     $(location).attr('href', '/track/' + hid.val());
                     window.open('/track/' + hid.val());
                 });
                 track_container.append(li);
