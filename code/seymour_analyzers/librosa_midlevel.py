@@ -62,13 +62,12 @@ def get_sync_features(lowlevel, frames):
 
     return mfcc, melspec, cqt, chroma
 
-def get_beat_features(lowlevel):
+def get_beat_features(duration, beat_times):
     '''Compute timing features for synchronous analysis'''
     
     # The "beat times" correspond to the timings which arise from using beat-synchronous feature aggregation
     # This will usually stick a phantom 0 on the beginning of the beat time
-    duration    = lowlevel['duration']
-    beats       = np.unique(np.concatenate([ [0.0], lowlevel['beat_times'] ]))
+    beats       = np.unique(np.concatenate([ [0.0], beat_times ]))
     beat_idx    = np.arange(float(len(beats)))
 
     return np.vstack([  beats, 
@@ -207,7 +206,7 @@ def get_segment_features(analysis, lowlevel, transformation_path):
     '''Construct the feature matrix for segmentation'''
     
     # Trim out any trailing beat features
-    bf = get_beat_features(lowlevel)[:, :analysis['beat_sync_mfcc'].shape[1]]
+    bf = get_beat_features(lowlevel['duration'], analysis['beat_times'])
 
     X = np.vstack([ analysis['beat_sync_mfcc'], 
                     analysis['repetition_mfcc'],
@@ -233,11 +232,24 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
     if features is None:
         features = set(get_feature_names())
 
+
+    # Beats might occur after the last hop
+    # We'll clip anything that's too big
+    beat_frames = librosa.time_to_frames(lowlevel['beat_times'],
+                                            sr=lowlevel['PARAMETERS']['load']['sr'],
+                                            hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
+
+    beat_frames = np.clip(beat_frames, 0, lowlevel['mfcc'].shape[1]-1)
+
+    # Pad on a phantom 0 here
+    beat_frames = np.unique(np.concatenate([[0], beat_frames]))
+
+    analysis['beat_times'] = librosa.frames_to_time(beat_frames, 
+                                                    sr=lowlevel['PARAMETERS']['load']['sr'],
+                                                    hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
+
     # Compute beat-sync features
     if 'beat_sync' in features:
-        beat_frames = librosa.time_to_frames(lowlevel['beat_times'],
-                                             sr=lowlevel['PARAMETERS']['load']['sr'],
-                                             hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
         (analysis['beat_sync_mfcc'], 
          analysis['beat_sync_mel_spectrogram'], 
          analysis['beat_sync_cqt'], 
@@ -245,11 +257,18 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
                                                 
                                                 
     
+    onset_frames = librosa.time_to_frames(lowlevel['onsets'],
+                                          sr=lowlevel['PARAMETERS']['load']['sr'],
+                                          hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
+
+    onset_frames = np.clip(onset_frames, 0, lowlevel['mfcc'].shape[1]-1)
+    onset_frames = np.unique(np.concatenate([[0], onset_frames]))
+
+    analysis['onset_times'] = librosa.frames_to_time(onset_frames, 
+                                                    sr=lowlevel['PARAMETERS']['load']['sr'],
+                                                    hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
     # Compute onset-sync features
     if 'onset_sync' in features:
-        onset_frames = librosa.time_to_frames(lowlevel['onsets'],
-                                             sr=lowlevel['PARAMETERS']['load']['sr'],
-                                             hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
 
         (analysis['onset_sync_mfcc'], 
          analysis['onset_sync_mel_spectrogram'], 
@@ -300,7 +319,8 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
         analysis['segment_beat_tree'] = []
 
         # Pad the beat times so that we include all points of aggregation
-        beat_times = np.unique(np.concatenate([[0], lowlevel['beat_times'], [lowlevel['duration']]]))
+        beat_times = np.unique(np.concatenate([analysis['beat_times'], [lowlevel['duration']]]))
+
         for level, bounds in enumerate(segment_boundaries):
             analysis['segment_beat_tree'].append(bounds)
             analysis['segment_time_tree'].append(beat_times[bounds])
