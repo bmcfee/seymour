@@ -112,7 +112,7 @@ function get_collection(collection_id, offset, limit) {
 
                 li.click(function() {
                     var hid = $($(this).find('input:hidden')[0]);
-                    console.log('Would load: ' + hid.val());
+                    $(location).attr('href', '/track/' + hid.val());
                 });
                 track_container.append(li);
             }
