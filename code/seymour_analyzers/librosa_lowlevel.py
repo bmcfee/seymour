@@ -41,7 +41,7 @@ ENVIRONMENT = {'librosa':    {'version':      librosa.__version__,
                }
 
 #-- Audio analysis guts
-def get_signal(y, sr, sr_target=2):
+def get_signal(y, sr, sr_target=5):
     '''Get a brutally downsampled audio signal for visualization purposes'''    
     frame_length = sr / sr_target
 
