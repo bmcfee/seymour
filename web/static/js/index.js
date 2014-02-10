@@ -44,6 +44,29 @@ function update_collections(collections) {
     get_collection(collections[0].collection_id, 0, 15);
 }
 
+
+$('.previous').click(function() {
+    if ($(this).hasClass('disabled')) {
+        return;
+    }
+    var offset          = $('#offset').val();
+    var limit           = $('#limit').val();
+    var collection_id   = $('#collection_id').val();
+
+    get_collection(collection_id, offset - limit, limit);
+});
+
+$('.next').click(function() {
+    if ($(this).hasClass('disabled')) {
+        return;
+    }
+    var offset          = $('#offset').val();
+    var limit           = $('#limit').val();
+    var collection_id   = $('#collection_id').val();
+
+    get_collection(collection_id, offset + limit, limit);
+});
+
 function get_collection(collection_id, offset, limit) {
 
 
@@ -59,6 +82,9 @@ function get_collection(collection_id, offset, limit) {
             } else {
                 $('.previous').removeClass('disabled');
             }
+            $('#offset').val(offset);
+            $('#limit').val(limit);
+            $('#collection_id').val(collection_id);
 
             var track_container = $("#tracklist");
 
@@ -89,6 +115,7 @@ function get_collection(collection_id, offset, limit) {
                 function(data) {
                     $("#track-total").text(data.track_count);
                     $("#collection-name").text(data.name);
+                    $('#track_count').val(data.track_count);
 
                     if (data.track_count > offset + tracklist.length) {
                         $('.next').removeClass('disabled');
