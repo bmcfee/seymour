@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import gordon
+import numpy as np
 import cPickle as pickle
 
 #-- collection functions
@@ -68,7 +69,7 @@ def __get_track_midlevel(track):
     data['segment_tree']= [z.tolist() for z in analysis['segment_beat_tree']]
     data['segments']    = analysis['segment_beat_tree'][analysis['segments_best']].tolist()
     data['cqt']         = (analysis['beat_sync_cqt'] ** (1./3)).T.tolist()
-    data['chroma']      = analysis['beat_sync_chroma'].T.tolist()
+    data['chroma']      = np.roll(analysis['beat_sync_chroma'], -3, axis=0).T.tolist()
 
     return data
 

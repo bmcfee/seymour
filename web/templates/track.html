@@ -23,6 +23,7 @@
                         preload="auto"
                         seekable="true"
                         ontimeupdate="track_progress(this.currentTime);">
+<!--                         id="audio-widget"> -->
                     </audio>
 
                 </li>
@@ -31,10 +32,7 @@
                     <a href="#structure" data-toggle="tab">Structure</a>
                 </li>
                 <li>
-                    <a href="#spectrum" data-toggle="tab">Spectrum</a>
-                </li>
-                <li>
-                    <a href="#overview" data-toggle="tab">Beats</a>
+                    <a href="#content" data-toggle="tab">Content</a>
                 </li>
             </ul>
         </div>
@@ -47,8 +45,16 @@
 
         <div class="tab-content">
         
-            <div id="overview" class="tab-pane">
+            <div id="content" class="tab-pane">
                 <dl class="dl-horizontal row">
+                    <dt> Beats </dt>
+                    <dd id="beats" class="plot beats" />
+
+                    <dt> Pitch classes </dt>
+                    <dd id="chroma" class="plot heatmap" />
+        
+                    <dt> Pitches </dt>
+                    <dd id="cqt" class="plot heatmap" />
 
                     <dt> Tempo </dt>
                     <dd id="tempo" class="plot beats" />
@@ -56,20 +62,6 @@
                     <dt> Tuning </dt>
                     <dd id="tuning" class="plot beats" />
 
-                    <dt> Beats </dt>
-                    <dd id="beats" class="plot beats" />
-    
-                </dl>
-            </div>
-
-            <div id="spectrum" class="tab-pane">
-                <dl class="dl-horizontal row">
-                    <dt> Spectrogram </dt>
-                    <dd id="spectrogram" class="plot heatmap" />
-
-                    <dt> Chroma </dt>
-                    <dd id="chroma" class="plot heatmap" />
-        
                 </dl>
             </div>
 

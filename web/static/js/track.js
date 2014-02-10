@@ -1,7 +1,13 @@
 
 // Initialize tabs
-$(function() { 
+// $(function() { 
+//     $('.tabs').tab();
+// });
+
+$(document).ready(function() {
+
     $('.tabs').tab();
+
 });
 
 // Retrieve the analysis object
@@ -73,7 +79,7 @@ function process_analysis(analysis) {
 
 
     // Plot the spectrogram
-    draw_heatmap(analysis['cqt'], analysis['beats'], '#spectrogram');
+    draw_heatmap(analysis['cqt'], analysis['beats'], '#cqt');
 
     // Draw the structure bundle
 
