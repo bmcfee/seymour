@@ -4,7 +4,6 @@
 # core librosa feature extractor to integrate with gordon/seymour
 
 import numpy as np
-import scipy.signal
 import librosa
 import mutagen
 import os
@@ -42,6 +41,16 @@ ENVIRONMENT = {'librosa':    {'version':      librosa.__version__,
                }
 
 #-- Audio analysis guts
+def get_signal(y, sr, sr_target=2):
+    '''Get a brutally downsampled audio signal for visualization purposes'''    
+    frame_length = sr / sr_target
+
+    yframe = librosa.util.frame(y, frame_length=frame_length, hop_length=frame_length)
+    ymax = np.abs(yframe).max(axis=0).reshape((1,-1))
+
+    return np.vstack([ymax, -ymax]).ravel(order='F').astype(np.float32)
+
+
 def get_hpss(y, PARAMETERS):
     '''Separate harmonic and percussive audio time series'''   
     # Get the STFT
@@ -171,7 +180,7 @@ def analyze_audio(input_file, features=None, analysis=None, PARAMETERS=None):
     
     # Pre-compute a downsampled time series for vis purposes
     if 'signal' in features:
-        analysis['signal']   = scipy.signal.decimate(y, len(y)/1024, ftype='fir').astype(np.float32)
+        analysis['signal']   = get_signal(y, sr)
     
     # Get a mel power spectrogram
     if 'mel_spectrogram' in features:
