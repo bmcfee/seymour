@@ -1,0 +1,22 @@
+{"repetition":      {   "mfcc" : {
+                                    "n_history":    2,
+                                    "metric":       "seuclidean",
+                                    "width":        3,
+                                    "kernel_size":  7,
+                                    "n_factors":    32},
+
+                        "chroma" : {
+                                    "n_history":    2,
+                                    "metric":       "cosine",
+                                    "width":        3,
+                                    "kernel_size":  7,
+                                    "n_factors":    32}
+                    },
+ 
+ "beat_neighbors":  {   "k":    5   },
+
+ "segments":        {   "transformation":   null,
+                        "min_seg":          10.0,
+                        "max_seg":          45.0}
+
+}

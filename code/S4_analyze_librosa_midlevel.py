@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# CREATED:2013-12-19 19:33:28 by Brian McFee <brm2132@columbia.edu>
-# core librosa feature extractor to integrate with gordon 
+# CREATED:2014-02-09 19:07:14 by Brian McFee <brm2132@columbia.edu>
+# intermediate librosa feature analysis: structure
 
 import argparse
 import cPickle as pickle
@@ -13,9 +13,10 @@ from joblib import Parallel, delayed
 import gordon
 
 # Pull in the audio analyzer
+from seymour_analyzers import librosa_midlevel
 from seymour_analyzers import librosa_lowlevel
 
-ANALYSIS_NAME = librosa_lowlevel.__description__
+ANALYSIS_NAME = librosa_midlevel.__description__
 
 #-- interface guts
 def get_output_file(path, ext='pickle'):
@@ -26,7 +27,7 @@ def get_output_file(path, ext='pickle'):
 
 def process_arguments():
 
-    parser = argparse.ArgumentParser(description='Librosa-Gordon low-level feature analysis')
+    parser = argparse.ArgumentParser(description='Librosa-Gordon intermediate feature analysis')
 
     parser.add_argument(    'feature_directory',
                             action  =   'store',
@@ -37,7 +38,7 @@ def process_arguments():
                             dest    =   'parameter_path',
                             action  =   'store',
                             type    =   str,
-                            default =   './parameters-lowlevel.json',
+                            default =   './parameters-midlevel.json',
                             help    =   'path to parameters json object')
 
     parser.add_argument(    '-j',
@@ -95,13 +96,17 @@ def create_annotation(track_id, feature_directory, recompute, PARAMETERS):
         print 'Pre-computed: ', output_file
         return track_id, output_file
 
+    if librosa_lowlevel.__description__ not in track.annotation_dict:
+        print 'Missing low-level analysis for ', track_id
+        return track_id, output_file
+
     print 'Analyzing ', track.path
 
     # Skip it if we've already got it cached
     if not recompute and ANALYSIS_NAME in track.annotation_dict:
         return track_id, track.annotation_dict[ANALYSIS_NAME]
 
-    analysis = librosa_lowlevel.analyze_audio(track.fn_audio, PARAMETERS=PARAMETERS)
+    analysis = librosa_midlevel.analyze_audio(track.fn_audio, PARAMETERS=PARAMETERS)
 
     filename = save_analysis(track.path, analysis, feature_directory)
     return track_id, filename

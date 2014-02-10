@@ -47,7 +47,6 @@ def get_feature_names():
             'onset_sync', 
             'loudness',
             'beat_neighbors',
-            'onset_neighbors',
             'repetition_mfcc',
             'repetition_chroma',
             'segment_times']
@@ -202,19 +201,19 @@ def get_segment_range(duration, min_seg, max_seg):
 
     return int(k_min), int(k_max)
 
-def get_segment_features(lowlevel, transformation_path):
+def get_segment_features(analysis, lowlevel, transformation_path):
     '''Construct the feature matrix for segmentation'''
     
-    X = np.vstack([ lowlevel['beat_sync_mfcc'], 
-                    lowlevel['repetition_mfcc'],
-                    lowlevel['repetition_chroma'],
+    X = np.vstack([ analysis['beat_sync_mfcc'], 
+                    analysis['repetition_mfcc'],
+                    analysis['repetition_chroma'],
                     get_beat_features(lowlevel) ])
 
-    if transformation_path is not None:
-        W = np.load(transformation_path)
-        return W.dot(X)
-    
-    return X
+    if transformation_path is None:
+        return X
+
+    W = np.load(transformation_path)
+    return W.dot(X)
 
 #-- Full feature extractor
 def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
@@ -255,27 +254,29 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
 
     if 'repetition_mfcc' in features:
         analysis['repetition_mfcc'] = get_repetition_features(analysis['beat_sync_mfcc'], 
-                                                              PARAMETERS['repetition_mfcc']['n_history'],
-                                                              PARAMETERS['repetition_mfcc']['metric'],
-                                                              PARAMETERS['repetition_mfcc']['kernel_size'],
-                                                              PARAMETERS['repetition_mfcc']['n_factors'])
+                                                              PARAMETERS['repetition']['mfcc']['n_history'],
+                                                              PARAMETERS['repetition']['mfcc']['metric'],
+                                                              PARAMETERS['repetition']['mfcc']['width'],
+                                                              PARAMETERS['repetition']['mfcc']['kernel_size'],
+                                                              PARAMETERS['repetition']['mfcc']['n_factors'])
 
     if 'repetition_chroma' in features:
         analysis['repetition_chroma'] = get_repetition_features(analysis['beat_sync_chroma'], 
-                                                              PARAMETERS['repetition_chroma']['n_history'],
-                                                              PARAMETERS['repetition_chroma']['metric'],
-                                                              PARAMETERS['repetition_chroma']['kernel_size'],
-                                                              PARAMETERS['repetition_chroma']['n_factors'])
+                                                              PARAMETERS['repetition']['chroma']['n_history'],
+                                                              PARAMETERS['repetition']['chroma']['metric'],
+                                                              PARAMETERS['repetition']['chroma']['width'],
+                                                              PARAMETERS['repetition']['chroma']['kernel_size'],
+                                                              PARAMETERS['repetition']['chroma']['n_factors'])
     if 'beat_neighbors' in features:
         analysis['mfcc_neighbors_beat']   = get_neighbors(analysis['beat_sync_mfcc'], 
-                                                          PARAMETERS['beat_neighbors']['mfcc']['k'],
-                                                          PARAMETERS['beat_neighbors']['mfcc']['width'],
-                                                          PARAMETERS['beat_neighbors']['mfcc']['metric'])
+                                                          PARAMETERS['beat_neighbors']['k'],
+                                                          PARAMETERS['repetition']['mfcc']['width'],
+                                                          PARAMETERS['repetition']['mfcc']['metric'])
 
         analysis['chroma_neighbors_beat'] = get_neighbors(analysis['beat_sync_chroma'], 
-                                                          PARAMETERS['beat_neighbors']['chroma']['k'],
-                                                          PARAMETERS['beat_neighbors']['chroma']['width'],
-                                                          PARAMETERS['beat_neighbors']['chroma']['metric'])
+                                                          PARAMETERS['beat_neighbors']['k'],
+                                                          PARAMETERS['repetition']['chroma']['width'],
+                                                          PARAMETERS['repetition']['chroma']['metric'])
 
     if 'segments' in features:
         # Get the min and max number of segments
