@@ -18,12 +18,9 @@
         <div class="navbar-inner">
             <ul class="nav nav-tabs">
                 <li class="pull-right" style="padding-top: 6px; padding-right: 6px;">
-                    <audio controls
-                        src="/audio/{{ track_id }}"
-                        preload="auto"
-                        seekable="true"
-                        ontimeupdate="track_progress(this.currentTime);">
-<!--                         id="audio-widget"> -->
+<!--                     <audio controls preload="auto" autobuffer id="audio-widget"> -->
+                    <audio controls id="audio-widget">
+                        <source src="/audio/{{ track_id }}">
                     </audio>
 
                 </li>

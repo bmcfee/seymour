@@ -1,13 +1,21 @@
 
 // Initialize tabs
-// $(function() { 
-//     $('.tabs').tab();
-// });
-
 $(document).ready(function() {
+
+    /*
+    try {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        context = new AudioContext();
+    } catch(e) {
+        alert('Web audio API is not supported in this browser');
+    }
+    */
 
     $('.tabs').tab();
 
+    $('#audio-widget').bind('timeupdate', function() { 
+        track_progress(this.currentTime);
+    });
 });
 
 // Retrieve the analysis object
@@ -17,8 +25,8 @@ $.ajax({
 }).done(process_analysis);
 
 // array container for brush updates
-var brush_updates = []
-var progress_updates = []
+var brush_updates       = [];
+var progress_updates    = [];
 
 // Update position for audio widget
 function track_progress(time) {
@@ -554,8 +562,14 @@ function draw_structure(beats, beat_links, segments, target) {
 
     function time_skip(idx) {
         return function(g, i) {
-            console.log('Skip to time: ' + beats[segments[idx]]);
-            $('audio')[0].currentTime = beats[segments[idx]];
+            var beat_id = segments[idx];
+
+            // Actually, we want to skip to the beat before the segment starts
+            if (beat_id > 0) {
+                beat_id -= 1;
+            }
+            console.log('Skip to time: ' + beats[beat_id]);
+            $('#audio-widget')[0].currentTime = beats[beat_id];
         };
     }
     for (var i = 0; i < segments.length; i++) {
