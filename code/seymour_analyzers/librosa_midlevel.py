@@ -133,7 +133,9 @@ def get_repetition_features(X, n_steps, metric, width, kernel_size, n_factors):
     L = scipy.signal.medfilt2d(L, kernel_size=[1, kernel_size])
 
     # Discard empty rows
-    L = L[L.any(axis=1)]
+    good_rows = L.any(axis=1)
+    if sum(good_rows) >= n_factors:
+        L = L[good_rows]
 
     return compress_features(L, n_factors)
 
