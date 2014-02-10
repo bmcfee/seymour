@@ -7,7 +7,7 @@ $(document).ready(function() {
 
     // Set the default and update the pager
     var collection_id   = parseInt($('#collection_id').val());
-    get_collection(collection_id, 0, 15);
+    get_collection(collection_id, 0, 20);
 });
 
 function dv(x, v) {
@@ -42,7 +42,7 @@ function update_collections(collections) {
         button.click(function() {
             var hidden = $(this).find('input:hidden')[0];
 
-            get_collection($(hidden).val(), 0, 15);
+            get_collection($(hidden).val(), 0, 20);
         });
         
         var badge = $('<span>').addClass('badge').addClass('pull-right');
@@ -83,7 +83,7 @@ function get_collection(collection_id, offset, limit) {
 
 
     offset = dv(offset, 0);
-    limit  = dv(limit, 15);
+    limit  = dv(limit, 20);
 
     offset = parseInt(offset);
     limit  = parseInt(limit);
