@@ -2,7 +2,10 @@
 // Initialize tabs
 $(document).ready(function() {
 
+
     $('.tabs').tab();
+
+    $(".tab-content").hide();
 
     $('#audio-widget').bind('timeupdate', function() { 
         track_progress(this.currentTime);
@@ -69,6 +72,10 @@ function process_analysis(analysis) {
 
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
+
+    $("#loading").hide();
+
+    $(".tab-content").show();
 }
 
 function draw_meta(values) {
