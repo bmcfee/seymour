@@ -110,15 +110,17 @@ function get_collection(collection_id, offset, limit) {
             $("#track-max").text(end);
 
             for (var i in tracklist) {
-                var li = $('<li></li>').addClass('list-group-item').addClass('track');
+                var li = $('<li>')
+                            .addClass('list-group-item')
+                            .addClass('track');
                 
                 var ctext = tracklist[i].artist;
                 if (tracklist[i].album.length > 0) {
                     ctext += ' - ' + tracklist[i].album;
                 }
-                var content = $('<div></div>');
-                content.append($('<h4></h4>').text(tracklist[i].title));
-                content.append($('<h5></h5>')
+                var content = $('<div>');
+                content.append($('<h4>').text(tracklist[i].title));
+                content.append($('<h5>')
                         .addClass('text-muted')
                         .text(ctext));
                 
