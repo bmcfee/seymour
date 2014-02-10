@@ -73,6 +73,10 @@ function get_collection(collection_id, offset, limit) {
     offset = dv(offset, 0);
     limit  = dv(limit, 15);
 
+    offset = parseInt(offset);
+    limit  = parseInt(limit);
+    collection_id = parseInt(collection_id);
+
     // First update the collection container
     $.ajax({url: '/tracks/' + collection_id + '/' + offset + '/' + limit,
             dataType: 'json'}).done(function(tracklist) {
@@ -88,8 +92,10 @@ function get_collection(collection_id, offset, limit) {
 
             var track_container = $("#tracklist");
 
-            $("#track-min").text(1 + offset);
-            $("#track-max").text(offset + tracklist.length);
+            var start = 1 + offset;
+            var end   = offset + tracklist.length;
+            $("#track-min").text(start);
+            $("#track-max").text(end);
 
             for (var i in tracklist) {
                 var li = $('<li></li>').addClass('list-group-item').addClass('track');
