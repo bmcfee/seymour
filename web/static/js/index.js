@@ -49,9 +49,9 @@ $('.previous').click(function() {
     if ($(this).hasClass('disabled')) {
         return;
     }
-    var offset          = $('#offset').val();
-    var limit           = $('#limit').val();
-    var collection_id   = $('#collection_id').val();
+    var offset          = parseInt($('#offset').val());
+    var limit           = parseInt($('#limit').val());
+    var collection_id   = parseInt($('#collection_id').val());
 
     get_collection(collection_id, offset - limit, limit);
 });
@@ -60,9 +60,9 @@ $('.next').click(function() {
     if ($(this).hasClass('disabled')) {
         return;
     }
-    var offset          = $('#offset').val();
-    var limit           = $('#limit').val();
-    var collection_id   = $('#collection_id').val();
+    var offset          = parseInt($('#offset').val());
+    var limit           = parseInt($('#limit').val());
+    var collection_id   = parseInt($('#collection_id').val());
 
     get_collection(collection_id, offset + limit, limit);
 });
