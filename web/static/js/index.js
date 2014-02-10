@@ -112,7 +112,8 @@ function get_collection(collection_id, offset, limit) {
 
                 li.click(function() {
                     var hid = $($(this).find('input:hidden')[0]);
-                    $(location).attr('href', '/track/' + hid.val());
+//                     $(location).attr('href', '/track/' + hid.val());
+                    window.open('/track/' + hid.val());
                 });
                 track_container.append(li);
             }
