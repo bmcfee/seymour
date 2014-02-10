@@ -2,8 +2,6 @@
 
 import gordon
 import cPickle as pickle
-import numpy as np
-import ujson as json
 
 #-- collection functions
 def get_collections():
@@ -65,11 +63,12 @@ def __get_track_midlevel(track):
         analysis = pickle.load(f)
 
     data = {}
-    data['beats'] = analysis['beat_times'].tolist()
-    data['links'] = analysis['mfcc_neighbors_beat'].tolist()
-    data['segments'] = analysis['segment_beat_tree'][analysis['segments_best']].tolist()
-    data['cqt']   = (analysis['beat_sync_cqt'] ** (1./3)).T.tolist()
-    data['chroma']   = analysis['beat_sync_chroma'].T.tolist()
+    data['beats']       = analysis['beat_times'].tolist()
+    data['links']       = analysis['mfcc_neighbors_beat'].tolist()
+    data['segment_tree']= [z.tolist() for z in analysis['segment_beat_tree']]
+    data['segments']    = analysis['segment_beat_tree'][analysis['segments_best']].tolist()
+    data['cqt']         = (analysis['beat_sync_cqt'] ** (1./3)).T.tolist()
+    data['chroma']      = analysis['beat_sync_chroma'].T.tolist()
 
     return data
 
@@ -77,32 +76,12 @@ def get_track_analysis(track_id):
 
     track = gordon.Track.query.get(track_id)
 
-    # metadata
-    #   id
-    #   title
-    #   artist
-    #   album
     analysis = { 'track_id':    track_id,
                  'title':       track.title,
                  'artist':      track.artist,
                  'album':       track.album}
 
-    # Features we need:
-    # lowlevel
-    #   signal
-    #   tempo
-    #   tuning
-    #   duration
-
     analysis.update(__get_track_lowlevel(track))
-
-    # midlevel
-    #   beats -- beat_times
-    #   links -- mfcc_neighbors_beat
-    #   segments -- segment_beats_tree[segments_best]
-    #   beat_sync_cqt
-    #   beat_sync_chroma
-
     analysis.update(__get_track_midlevel(track))
 
     return analysis

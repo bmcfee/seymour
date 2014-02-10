@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <!-- Latest compiled and minified CSS -->
+        <link   rel="stylesheet" 
+                href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+
+        <!-- Optional theme -->
+        <link   rel="stylesheet" 
+                href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+        <link   rel="stylesheet"
+                href="/static/css/track.css">
+    </head>
+
+    <body>
+        <div class="navbar-inner">
+            <ul class="nav nav-tabs">
+                <li class="pull-right" style="padding-top: 6px; padding-right: 6px;">
+                    <audio controls
+                        src="/audio/{{ track_id }}"
+                        preload="auto"
+                        seekable="true"
+                        ontimeupdate="track_progress(this.currentTime);">
+                    </audio>
+
+                </li>
+
+                <li class="active">
+                    <a href="#structure" data-toggle="tab">Structure</a>
+                </li>
+                <li>
+                    <a href="#spectrum" data-toggle="tab">Spectrum</a>
+                </li>
+                <li>
+                    <a href="#overview" data-toggle="tab">Beats</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- content visualization goes here -->
+        <dl class="dl-horizontal row">
+            <dt> Waveform </dt>
+            <dd id="signal" class="plot zoomwindow" />
+        </dl>
+
+        <div class="tab-content">
+        
+            <div id="overview" class="tab-pane">
+                <dl class="dl-horizontal row">
+
+                    <dt> Tempo </dt>
+                    <dd id="tempo" class="plot beats" />
+
+                    <dt> Tuning </dt>
+                    <dd id="tuning" class="plot beats" />
+
+                    <dt> Beats </dt>
+                    <dd id="beats" class="plot beats" />
+    
+                </dl>
+            </div>
+
+            <div id="spectrum" class="tab-pane">
+                <dl class="dl-horizontal row">
+                    <dt> Spectrogram </dt>
+                    <dd id="spectrogram" class="plot heatmap" />
+
+                    <dt> Chroma </dt>
+                    <dd id="chroma" class="plot heatmap" />
+        
+                </dl>
+            </div>
+
+            <div id="structure" class="tab-pane active">
+                <dl class="dl-horizontal row">
+                    <dt> Structure </dt>
+                    <dd><div id="structplot" class="structplot"></div></dd>
+                </dl>
+            </div>
+
+        </div>
+        
+        <div class="navbar navbar-fixed-bottom navbar-inverse">
+            <ul class="nav">
+                <li class="navbar-text"><strong><span id="track_title"></span></strong></li>
+                <li class="divider-vertical" />
+                <li class="navbar-text"><span id="track_artist"></span></li>
+                <li class="divider-vertical" />
+                <li class="navbar-text"><span id="track_album"></span></li>
+                <li class="divider-vertical" />
+                <li class="navbar-text"><span id="track_date"></span></li>
+            </ul>
+
+        </div>
+
+        <input type="hidden" id="track_id" value="{{ track_id }}" />
+    </body>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/colorbrewer.js"></script>
+    <script type="text/javascript" src="/static/js/track.js"></script>
+
+</html>

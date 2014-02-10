@@ -40,6 +40,9 @@ def get_track_audio(track_id):
 def get_track_analysis(track_id):
     return json.encode(data_layer.get_track_analysis(track_id))
 
+@app.route('/track/<int:track_id>')
+def get_track(track_id):
+    return flask.render_template('track.html', track_id=track_id)
 
 @app.route('/collection/<int:collection_id>')
 def get_collection_info(collection_id):
