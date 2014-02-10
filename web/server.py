@@ -32,6 +32,15 @@ def load_config(server_ini):
 def run(**kwargs):
     app.run(**kwargs)
 
+@app.route('/audio/<int:track_id>')
+def get_track_audio(track_id):
+    return flask.send_file(data_layer.get_track_audio(track_id), cache_timeout=0)
+
+@app.route('/analysis/<int:track_id>')
+def get_track_analysis(track_id):
+    return json.encode(data_layer.get_track_analysis(track_id))
+
+
 @app.route('/collection/<int:collection_id>')
 def get_collection_info(collection_id):
     return json.encode(data_layer.get_collection_info(collection_id));
