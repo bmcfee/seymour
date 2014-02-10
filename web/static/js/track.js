@@ -45,12 +45,11 @@ function process_analysis(analysis) {
     analysis['beats'].push(analysis['duration']);
 
     // Header info
-//     $("#song_name")
-//         .text(analysis['filename']);
-//     $("#duration")
-//         .text(num_to_time(analysis['duration']));
     $("#tempo")
         .text(analysis['tempo'].toFixed(2) + ' BPM');
+
+    $("#duration")
+        .text(analysis['duration'].toFixed(2) + ' seconds');
 
     $("#tuning")
         .text((100 * analysis['tuning']).toFixed(0) + ' cents');
@@ -62,18 +61,6 @@ function process_analysis(analysis) {
     // Plot the beat chart
     draw_beats(analysis['beats']);
 
-    // Plot the loudness chart
-//     draw_line(analysis['loudness'], 
-//                 analysis['beats'], 
-//                 '#loudness',
-//                 [d3.min(analysis['loudness']), 0.0]);
-
-    // Plot the harmonicity chart
-//     draw_line(analysis['harmonicity'], 
-//                 analysis['beats'], 
-//                 '#harmonicity',
-//                 [d3.min(analysis['harmonicity']), 1.0]);
-
     // Plot the chromagram
     draw_heatmap(analysis['chroma'], analysis['beats'], '#chroma');
 
@@ -82,7 +69,6 @@ function process_analysis(analysis) {
     draw_heatmap(analysis['cqt'], analysis['beats'], '#cqt');
 
     // Draw the structure bundle
-
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
 }
 
@@ -99,6 +85,8 @@ function draw_meta(values) {
     $("#track_title").text(title);
     $("#track_artist").text(artist);
     $("#track_album").text(album);
+
+    document.title = '[Seymour] ' + artist + ' - '  + title;
 }
 
 function draw_beats(values) {
