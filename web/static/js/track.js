@@ -2,15 +2,6 @@
 // Initialize tabs
 $(document).ready(function() {
 
-    /*
-    try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        context = new AudioContext();
-    } catch(e) {
-        alert('Web audio API is not supported in this browser');
-    }
-    */
-
     $('.tabs').tab();
 
     $('#audio-widget').bind('timeupdate', function() { 
