@@ -22,8 +22,29 @@ $.ajax({
 var brush_updates       = [];
 var progress_updates    = [];
 
+var beat_times          = null;
+var last_beat           = null;
+
 // Update position for audio widget
 function track_progress(time) {
+
+    // find the current beat
+    var current_beat = last_beat;
+
+    for (var b = last_beat; b < beat_times.length; b++) {
+        if (beat_times[b] > time) {
+            current_beat = b - 1;
+            break;
+        }
+    }
+
+    if (current_beat == last_beat) {
+        return;
+    }
+    
+    last_beat = current_beat;
+
+    // return early if the current beat hasn't changed
     progress_updates.forEach(function(update) {
         update(time);
     });
@@ -45,6 +66,9 @@ function process_analysis(analysis) {
         analysis['beats'].unshift(0.0);
     }
     analysis['beats'].push(analysis['duration']);
+
+    beat_times  = analysis['beats'];
+    last_beat   = 0;
 
     // Header info
     $("#tempo")
@@ -73,9 +97,9 @@ function process_analysis(analysis) {
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
 
-    $("#loading").hide();
-
-    $(".tab-content").show();
+    $("#loading").fadeOut(0.25, function() { 
+        $(".tab-content").show();
+    });
 }
 
 function draw_meta(values) {
@@ -361,7 +385,7 @@ function draw_heatmap(features, beats, target, yAxis, range) {
 
     var color = d3.scale.linear()
         .domain(range || d3.extent(flatten(features)))
-        .range([$('body').css('background'), $('body').css('color')])
+        .range([$('body').css('background'), colorbrewer.Purples[3].slice(-1)[0]])
         .interpolate(d3.interpolateLab);
 
     var x = d3.scale.linear().range([0, width]).domain(extent);
