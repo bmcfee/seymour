@@ -49,7 +49,7 @@ def get_feature_names():
             'beat_neighbors',
             'repetition_mfcc',
             'repetition_chroma',
-            'segment_times']
+            'segments']
 
 #-- Feature analysis guts
 def get_sync_features(lowlevel, frames):
@@ -65,8 +65,10 @@ def get_sync_features(lowlevel, frames):
 def get_beat_features(lowlevel):
     '''Compute timing features for synchronous analysis'''
     
-    beats       = np.unique(np.concatenate([ [0.0], lowlevel['beat_times'] ]))
+    # The "beat times" correspond to the timings which arise from using beat-synchronous feature aggregation
+    # This will usually stick a phantom 0 on the beginning of the beat time
     duration    = lowlevel['duration']
+    beats       = np.unique(np.concatenate([ [0.0], lowlevel['beat_times'] ]))
     beat_idx    = np.arange(float(len(beats)))
 
     return np.vstack([  beats, 
@@ -185,9 +187,9 @@ def get_segments(X, k_min, k_max):
     costs       = []
 
     for k in range(k_min, k_max+1):
-        b_k, cost_k = __get_k_segments(X, k)
+        b_k, c_k = __get_k_segments(X, k)
         boundaries.append(b_k)
-        costs.append(cost_k)
+        costs.append(c_k)
             
     best_idx = np.argmin(costs)
 
@@ -204,10 +206,13 @@ def get_segment_range(duration, min_seg, max_seg):
 def get_segment_features(analysis, lowlevel, transformation_path):
     '''Construct the feature matrix for segmentation'''
     
+    # Trim out any trailing beat features
+    bf = get_beat_features(lowlevel)[:, :analysis['beat_sync_mfcc'].shape[1]]
+
     X = np.vstack([ analysis['beat_sync_mfcc'], 
                     analysis['repetition_mfcc'],
                     analysis['repetition_chroma'],
-                    get_beat_features(lowlevel) ])
+                    bf ])
 
     if transformation_path is None:
         return X
@@ -230,7 +235,7 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
 
     # Compute beat-sync features
     if 'beat_sync' in features:
-        beat_frames = librosa.frames_to_time(lowlevel['beat_times'],
+        beat_frames = librosa.time_to_frames(lowlevel['beat_times'],
                                              sr=lowlevel['PARAMETERS']['load']['sr'],
                                              hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
         (analysis['beat_sync_mfcc'], 
@@ -242,14 +247,14 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
     
     # Compute onset-sync features
     if 'onset_sync' in features:
-        onset_frames = librosa.frames_to_time(lowlevel['onsets'],
+        onset_frames = librosa.time_to_frames(lowlevel['onsets'],
                                              sr=lowlevel['PARAMETERS']['load']['sr'],
                                              hop_length=lowlevel['PARAMETERS']['stft']['hop_length'])
 
-        (analysis['beat_sync_mfcc'], 
-         analysis['beat_sync_mel_spectrogram'], 
-         analysis['beat_sync_cqt'], 
-         analysis['beat_sync_chroma']) = get_sync_features(lowlevel, onset_frames)
+        (analysis['onset_sync_mfcc'], 
+         analysis['onset_sync_mel_spectrogram'], 
+         analysis['onset_sync_cqt'], 
+         analysis['onset_sync_chroma']) = get_sync_features(lowlevel, onset_frames)
 
 
     if 'repetition_mfcc' in features:
@@ -285,18 +290,23 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
                                          PARAMETERS['segments']['max_seg'])
 
         # Build the feature stack
-        X_segment = get_segment_features(lowlevel, PARAMETERS['segments']['transformation'])
+        X_segment = get_segment_features(analysis, lowlevel, PARAMETERS['segments']['transformation'])
 
         # Get the segment boundaries for each k in the range
         segment_boundaries, analysis['segments_best'] = get_segments(X_segment, k_min, k_max)
 
         # Convert back to boundary times
-        analysis['segment_tree'] = []
+        analysis['segment_time_tree']  = []
+        analysis['segment_beat_tree'] = []
+
+        # Pad the beat times so that we include all points of aggregation
+        beat_times = np.unique(np.concatenate([[0], lowlevel['beat_times'], [lowlevel['duration']]]))
         for level, bounds in enumerate(segment_boundaries):
-            analysis['segment_tree'].append(lowlevel['beat_times'][bounds])
+            analysis['segment_beat_tree'].append(bounds)
+            analysis['segment_time_tree'].append(beat_times[bounds])
 
         # Just to make it easy, copy over the best segmentation
-        analysis['segments'] = analysis['segment_tree'][analysis['segments_best']]
+        analysis['segment_times'] = analysis['segment_time_tree'][analysis['segments_best']]
 
 
     PREV = analysis.get('PREVIOUS', {})

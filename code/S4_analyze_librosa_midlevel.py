@@ -88,6 +88,8 @@ def save_analysis(track_path, analysis, feature_directory):
 
 def create_annotation(track_id, feature_directory, recompute, PARAMETERS):
     
+    lowlevel = librosa_lowlevel.__description__
+
     track = gordon.Track.query.get(track_id)
 
     output_file = os.path.join(feature_directory, get_output_file(track.path))
@@ -96,9 +98,11 @@ def create_annotation(track_id, feature_directory, recompute, PARAMETERS):
         print 'Pre-computed: ', output_file
         return track_id, output_file
 
-    if librosa_lowlevel.__description__ not in track.annotation_dict:
+    if lowlevel not in track.annotation_dict:
         print 'Missing low-level analysis for ', track_id
         return track_id, output_file
+
+    lowlevel_data = track.annotation_dict[lowlevel]
 
     print 'Analyzing ', track.path
 
@@ -106,7 +110,7 @@ def create_annotation(track_id, feature_directory, recompute, PARAMETERS):
     if not recompute and ANALYSIS_NAME in track.annotation_dict:
         return track_id, track.annotation_dict[ANALYSIS_NAME]
 
-    analysis = librosa_midlevel.analyze_audio(track.fn_audio, PARAMETERS=PARAMETERS)
+    analysis = librosa_midlevel.analyze_features(lowlevel_data, PARAMETERS=PARAMETERS)
 
     filename = save_analysis(track.path, analysis, feature_directory)
     return track_id, filename
