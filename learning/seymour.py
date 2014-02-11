@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Module to simplify interaction with gordon"""
 
+import mir_eval
 import gordon
 import cPickle as pickle
 
@@ -17,6 +18,15 @@ def get_collection_tracks(name):
 def get_track(t_id):
     """Get the track object given the id"""
     return gordon.Track.query.get(t_id)
+
+def get_annotation(track_id, annotation='segments', **kwargs):
+    '''get annotation data for a given track'''
+
+    track = get_track(track_id)
+
+    annotation_file = track.annotation_dict[annotation]
+
+    return mir_eval.io.load_annotation(annotation_file, **kwargs)
 
 def get_analysis(track_id, analysis='librosa:low-level'):
     '''get the analysis data for a track by id'''
