@@ -101,17 +101,14 @@ def get_training_data(collection_names):
 
     return data
 
-def score_example(W, example):
+def score_example(W, features=None, k_min=None, k_max=None, beat_times=None, boundary_times=None, boundary_beats=None):
     '''Compute the NCE F-measure score for an example'''
 
-    seg_predict_tree, best_idx = midlevel.get_segments(W.dot(example['features']),
-                                                       example['k_min'],
-                                                       example['k_max'])
+    # Do the full prediction
+    seg_predict_tree, best_idx = midlevel.get_segments(W.dot(features), k_min, k_max)
 
     # Make sure the beat times cover the entire range, pad
-    beat_times      = mir_eval.util.adjust_times(example['beat_times'], 
-                                                 t_min=0.0,
-                                                 t_max=example['boundary_times'][-1])[0]
+    beat_times      = mir_eval.util.adjust_times(beat_times, t_min=0.0, t_max=boundary_times[-1])[0]
 
     print len(beat_times), max(seg_predict_tree[best_idx])
     predicted_times = beat_times[seg_predict_tree[best_idx]]
@@ -119,10 +116,10 @@ def score_example(W, example):
     # Tack on the track duration to the end
     predicted_times = mir_eval.util.adjust_times(predicted_times, 
                                                  t_min=0.0,
-                                                 t_max=example['boundary_times'][-1])[0]
+                                                 t_max=boundary_times[-1])[0]
 
     # Compute the score, pull off the f-measure
-    score = mir_eval.segment.frame_clustering_nce(example['boundary_times'], predicted_times)[-1]
+    score = mir_eval.segment.frame_clustering_nce(boundary_times, predicted_times)[-1]
     return score
 
 def fit_model(train_data, num_jobs=1, sigma_min=0, sigma_max=9):
@@ -151,7 +148,7 @@ def fit_model(train_data, num_jobs=1, sigma_min=0, sigma_max=9):
         olda_model.fit(features, boundary_beats)
 
         # Evaluate on the training set
-        scores = Parallel(n_jobs=num_jobs)(delayed(score_example)(olda_model.components_, example) 
+        scores = Parallel(n_jobs=num_jobs)(delayed(score_example)(olda_model.components_, **example) 
                                             for _, example in train_data.iteritems())
 
         mean_score = np.mean(scores)
