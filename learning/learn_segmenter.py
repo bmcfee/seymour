@@ -108,9 +108,8 @@ def score_example(W, features=None, k_min=None, k_max=None, beat_times=None, bou
     seg_predict_tree, best_idx = midlevel.get_segments(W.dot(features), k_min, k_max)
 
     # Make sure the beat times cover the entire range, pad
-    beat_times      = mir_eval.util.adjust_times(beat_times, t_min=0.0, t_max=boundary_times[-1])[0]
+    beat_times = np.unique(np.concatenate([beat_times, boundary_times[-1]]))
 
-    print len(beat_times), max(seg_predict_tree[best_idx])
     predicted_times = beat_times[seg_predict_tree[best_idx]]
 
     # Tack on the track duration to the end
