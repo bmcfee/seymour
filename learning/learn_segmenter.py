@@ -113,6 +113,7 @@ def score_example(W, example):
                                                  t_min=0.0,
                                                  t_max=example['boundary_times'][-1])[0]
 
+    print len(beat_times), max(seg_predict_tree[best_idx])
     predicted_times = beat_times[seg_predict_tree[best_idx]]
 
     # Tack on the track duration to the end
