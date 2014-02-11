@@ -16,12 +16,9 @@
         <style type="text/css">
 
             li.track {
-                position: relative;
-                margin:         8px;
+                margin:         4px;
                 padding:        4px;
-                width:          20%;
                 text-align:     justify;
-                border-radius:  0px !important; // disable rounded corners
             }
             li:hover.track {
                 background: #9ecae1;
@@ -51,30 +48,27 @@
             </div>
         </nav>
 
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <input type="hidden" id="offset" />
-                    <input type="hidden" id="limit" />
-                    <input type="hidden" id="track_count" />
-                    <input type="hidden" id="collection_id" value="{{ collection_id }}" />
-                    <ul class="pager">
-                        <li class="previous"><a href="#">&larr; Previous</a></li>
-                        <li>
-                            Tracks <span id="track-min"></span> to <span id="track-max"></span> of
-                            <span id="track-total"></span> in 
-                            <b id="collection-name"></b>
-                        </li>
+        <div class="container container-fluid col-md-12">
+            <div class="row">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <input type="hidden" id="offset" />
+                        <input type="hidden" id="limit" />
+                        <input type="hidden" id="track_count" />
+                        <input type="hidden" id="collection_id" value="{{ collection_id }}" />
+                        <ul class="pager">
+                            <li class="previous"><a href="#">&larr; Previous</a></li>
+                            <li> Tracks <span id="track-min"></span> to <span id="track-max"></span> of <span id="track-total"></span> in <b id="collection-name"></b> </li>
 
-                        <li class="next"><a href="#">Next &rarr;</a></li>
-                    </ul>
-                </div>
-                <div class="panel-body">
-                    <ul id="tracklist" class="list-inline"></ul>
+                            <li class="next"><a href="#">Next &rarr;</a></li>
+                        </ul>
+                    </div>
+                    <div class="panel-body container container-fluid center-block">
+                        <ul id="tracklist" class="list-inline"></ul>
+                    </div>
                 </div>
             </div>
         </div>
-
     </body>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>

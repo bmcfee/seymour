@@ -112,6 +112,7 @@ function get_collection(collection_id, offset, limit) {
             for (var i in tracklist) {
                 var li = $('<li>')
                             .addClass('list-group-item')
+                            .addClass('col-md-3')
                             .addClass('track');
                 
                 var ctext = tracklist[i].artist;
@@ -120,7 +121,7 @@ function get_collection(collection_id, offset, limit) {
                 }
                 var content = $('<div>');
                 content.append($('<h4>').text(tracklist[i].title));
-                content.append($('<h5>')
+                content.append($('<h6>')
                         .addClass('text-muted')
                         .text(ctext));
                 
