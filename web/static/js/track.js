@@ -28,6 +28,10 @@ var last_beat           = null;
 // Update position for audio widget
 function track_progress(time) {
 
+    if (beat_times == null) {
+        return;
+    }
+
     // find the current beat
     var current_beat = last_beat;
 
