@@ -172,7 +172,7 @@ def learn_segmenter(model_file=None, num_jobs=1, collections=None, sigma_min=0, 
     train_data = get_training_data(collections)
 
     # Step 2: learn the model
-    print 'Fitting the model... '
+    print 'Fitting the model on %d tracks ' % len(train_data)
     model   =   fit_model(train_data, num_jobs=num_jobs, sigma_min=sigma_min, sigma_max=sigma_max)
 
     # Step 3: save the results
