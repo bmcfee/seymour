@@ -79,7 +79,7 @@ function process_analysis(analysis) {
         .text(analysis['duration'].toFixed(2) + ' seconds');
 
     $("#tuning")
-        .text((analysis['tuning'] >= 0 ? '+' : '-') + (100 * analysis['tuning']).toFixed(0) + '\u00A2');
+        .text((analysis['tuning'] >= 0 ? '+' : '') + (100 * analysis['tuning']).toFixed(0) + '\u00A2');
 
     draw_meta( analysis );
 
@@ -98,9 +98,6 @@ function process_analysis(analysis) {
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
 
-//     $("#loading").fadeOut(0.25, function() { 
-//         $("#analysis").removeClass('hidden');
-//     });
 }
 
 function draw_meta(values) {
