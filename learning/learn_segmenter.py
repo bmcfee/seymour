@@ -54,9 +54,12 @@ def process_arguments(args):
 
 def get_track_data(t_id):
     '''Get the data for a given track'''
-
-    analysis_mid        = seymour.get_analysis(t_id, analysis=midlevel.__description__)
+    
+    # Get the ground-truth segments
     segments, labels    = seymour.get_annotation(t_id, annotation='segments')
+    
+    # Get the mid-level analysis
+    analysis_mid        = seymour.get_analysis(t_id, analysis=midlevel.__description__)
 
     # Flatten segment start/ends to boundaries
     boundary_times      = np.unique(segments.ravel())
@@ -101,11 +104,14 @@ def learn_segmenter(model_file=None, num_jobs=1, collections=None, sigma_min=0, 
     '''Outer layer of the segment learner'''
 
     # Step 1: build the data
+    print 'Building training data... '
     train_data = get_training_data(collections)
 
     # Step 2: learn the model
+    print 'Fitting the model... '
 
-    # Step 3: fit the 
+    # Step 3: save the results
+    print 'Saving to ', model_file
 
     pass
 
