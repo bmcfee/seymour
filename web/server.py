@@ -159,6 +159,6 @@ if __name__ == '__main__':
     if os.environ.get('ENV') == 'production':
         port = int(os.environ.get('PORT'))
 
-    run(host=parameters['host'], port=port, debug=DEBUG)
+    run(host=parameters['host'], port=port, debug=DEBUG, processes=3)
 
 
