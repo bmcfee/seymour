@@ -108,7 +108,7 @@ def learn_segmenter(model_file=None, num_jobs=1, collections=None, sigma_min=0, 
     print 'Building training data... '
     train_data = get_training_data(collections)
 
-    pickle.dump(train_data, 'train_data.pickle')
+    pickle.dump(train_data, open('train_data.pickle', 'w'))
 
     # Step 2: learn the model
     print 'Fitting the model... '
