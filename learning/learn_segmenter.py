@@ -7,6 +7,7 @@ import sys
 from joblib import Parallel, delayed
 import mir_eval
 import numpy as np
+import cPickle as pickle
 
 import OLDA
 import seymour
@@ -106,6 +107,8 @@ def learn_segmenter(model_file=None, num_jobs=1, collections=None, sigma_min=0, 
     # Step 1: build the data
     print 'Building training data... '
     train_data = get_training_data(collections)
+
+    pickle.dump(train_data, 'train_data.pickle')
 
     # Step 2: learn the model
     print 'Fitting the model... '
