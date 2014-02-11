@@ -7,7 +7,7 @@ $(document).ready(function() {
 
     // Set the default and update the pager
     var collection_id   = parseInt($('#collection_id').val());
-    get_collection(collection_id, 0, 20);
+    get_collection(collection_id, 0, 18);
 });
 
 function dv(x, v) {
@@ -42,7 +42,7 @@ function update_collections(collections) {
         button.click(function() {
             var hidden = $(this).find('input:hidden')[0];
 
-            get_collection($(hidden).val(), 0, 20);
+            get_collection($(hidden).val(), 0, 18);
         });
         
         var badge = $('<span>').addClass('badge').addClass('pull-right');
@@ -83,7 +83,7 @@ function get_collection(collection_id, offset, limit) {
 
 
     offset = dv(offset, 0);
-    limit  = dv(limit, 20);
+    limit  = dv(limit, 18);
 
     offset = parseInt(offset);
     limit  = parseInt(limit);
@@ -110,30 +110,30 @@ function get_collection(collection_id, offset, limit) {
             $("#track-max").text(end);
 
             for (var i in tracklist) {
-                var li = $('<li>')
-                            .addClass('list-group-item')
-                            .addClass('col-md-3')
-                            .addClass('track');
                 
+                var content = $('<a>')
+                        .addClass('list-group-item')
+                        .addClass('col-md-3')
+                        .addClass('track')
+                        .attr('href', '/track/'+ tracklist[i].track_id)
+                        .attr('target', '_blank');
+
+
+                content.append($('<h4>')
+                        .addClass('list-group-item-heading')
+                        .text(tracklist[i].title));
+
                 var ctext = tracklist[i].artist;
                 if (tracklist[i].album.length > 0) {
                     ctext += ' - ' + tracklist[i].album;
                 }
-                var content = $('<div>');
-                content.append($('<h4>').text(tracklist[i].title));
-                content.append($('<h6>')
+
+                content.append($('<p>')
+                        .addClass('list-group-item-text')
                         .addClass('text-muted')
                         .text(ctext));
                 
-                var hidden = $('<input type="hidden">').val(tracklist[i].track_id);
-                li.append(hidden);
-                li.append(content);
-
-                li.click(function() {
-                    var hid = $($(this).find('input:hidden')[0]);
-                    window.open('/track/' + hid.val());
-                });
-                track_container.append(li);
+                track_container.append(content);
             }
             // Update the collection container object
             $.ajax({url: '/collection/' + collection_id, dataType: 'json'}).done(
