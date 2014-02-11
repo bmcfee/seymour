@@ -22,6 +22,7 @@ var progress_updates    = [];
 var beat_times          = null;
 var last_beat           = null;
 
+
 // Update position for audio widget
 function track_progress(time) {
 
@@ -39,10 +40,6 @@ function track_progress(time) {
         }
     }
 
-    if (current_beat == last_beat) {
-        return;
-    }
-    
     last_beat = current_beat;
 
     // return early if the current beat hasn't changed
@@ -66,8 +63,10 @@ function process_analysis(analysis) {
     if (analysis['beats'][0] > 0) {
         analysis['beats'].unshift(0.0);
     }
+    // extend the beat array to cover the entire track duration
     analysis['beats'].push(analysis['duration']);
 
+    /* Reset the beat time registry */
     beat_times  = analysis['beats'];
     last_beat   = 0;
 
@@ -157,10 +156,12 @@ function draw_beats(values) {
       .attr("transform", "translate(0," + height + ")");
 
 
-    svg.append("defs").append("clipPath").attr("id", "clip")
-        .append("rect")
-            .attr("width", width)
-            .attr("height", height);
+    svg.append("defs")
+        .append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+                .attr("width", width)
+                .attr("height", height);
 
     var zoomable = svg.append('g').attr('clip-path', 'url(#clip)');
     
@@ -376,8 +377,6 @@ function draw_heatmap(features, beats, target, yAxis, range) {
         width   = $('.plot').width() - margin.left - margin.right,
         height  = $('.heatmap').height() - margin.top - margin.bottom;
 
-    var extent = [0, beats[beats.length-1]];
-
     var n_bins = features[0].length;
 
 
@@ -386,7 +385,9 @@ function draw_heatmap(features, beats, target, yAxis, range) {
         .range([$('body').css('background'), colorbrewer.Purples[3].slice(-1)[0]])
         .interpolate(d3.interpolateLab);
 
-    var x = d3.scale.linear().range([0, width]).domain(extent);
+    var x = d3.scale.linear()
+                .range([0, width])
+                .domain(d3.extent(beats));
 
     var xAxis = d3.svg.axis()
                     .scale(x)
@@ -397,39 +398,38 @@ function draw_heatmap(features, beats, target, yAxis, range) {
                 .range([height, 0])
                 .domain([0, n_bins]);
 
-    var svg = d3.select(target).append('svg')
+    var svg = d3.select(target)
+                .append('svg')
                     .attr('width', width + margin.left + margin.right)
                     .attr('height', height + margin.top + margin.bottom)
-                    .append('g')
+                .append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    svg.append("defs").append("clipPath").attr("id", "clip")
-        .append("rect")
-            .attr("width", width)
-            .attr("height", height);
 
     svg.append('g')
             .attr('class', 'x axis')
             .attr('transform', 'translate(0,' + (height + margin.top) + ')');
 
-    if (yAxis) {
-        svg.append('g')
-            .attr('class', 'y axis')
-            .call(yAxis);
-    }
+    svg.append("defs")
+        .append("clipPath")
+            .attr("id", "clip")
+        .append("rect")
+            .attr("width", width)
+            .attr("height", height);
 
-    var nodes = [];
     var zoomers = svg.append('g').attr('clip-path', 'url(#clip)');
     var cols = []
 
     for (var i = 0; i < beats.length-1; i++) {
 
-        var my_data = {x: beats[i], width: x(beats[i+1] - beats[i]), values: features[i]};
+        var my_data = { time:   beats[i], 
+                        width:  x(beats[i+1] - beats[i]), 
+                        values: features[i]};
+
         cols.push(my_data);
 
         var beat_stack = zoomers.append('g').datum(my_data)
                             .attr('class', 'heatmap-bar')
-                            .attr('transform', 'translate(' + x(my_data.x) + ', 0) scale(1, 1)');
+                            .attr('transform', 'translate(' + x(my_data.time) + ', 0) scale(1, 1)');
 
         for (var j = 0; j < n_bins; j++) {
             beat_stack.append('rect')
@@ -443,14 +443,17 @@ function draw_heatmap(features, beats, target, yAxis, range) {
 
     }
 
+
+    var extent = [beats[0], beats[beats.length-1]];
     function update(domain) {
         var scale = (extent[1] - extent[0]) / (domain[1] - domain[0]);
 
         x.domain(domain);
         svg.select('.x.axis').call(xAxis);
-        zoomers.selectAll('.heatmap-bar')
+
+        svg.selectAll('.heatmap-bar')
                 .attr('transform', function(d) { 
-                    return 'translate(' + x(d.x) + ', 0) scale(' + scale + ',1)'; 
+                    return 'translate(' + x(d.time) + ', 0) scale(' + scale + ', 1)'; 
                 } );
     }
     update(extent);
@@ -458,7 +461,7 @@ function draw_heatmap(features, beats, target, yAxis, range) {
     brush_updates.push(update);
 
     var time_to_column = d3.scale.quantize()
-                            .domain(beats.slice(0, beats.length-1))
+                            .domain(cols.map(function(d) { return d.time; }))
                             .range(cols);
 
     var marker = zoomers.append('rect')
@@ -476,7 +479,7 @@ function draw_heatmap(features, beats, target, yAxis, range) {
         var b = time_to_column(xpos);
 
         marker.datum(b);
-        marker.attr('transform', 'translate(' + x(b.x) + ',0) scale(' + scale + ',1)')
+        marker.attr('transform', 'translate(' + x(b.time) + ',0) scale(' + scale + ',1)')
             .attr('width', b.width);
     }
     update_marker(0);

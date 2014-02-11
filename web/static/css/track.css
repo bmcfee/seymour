@@ -36,7 +36,6 @@
   stroke: gray;
   fill: steelblue;
   fill-opacity: .25;
-/*   shape-rendering: crispEdges; */
 }
 
 body { padding-bottom: 70px; overflow-x: hidden; }
