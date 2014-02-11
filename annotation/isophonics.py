@@ -37,8 +37,8 @@ def parse_arguments():
 
 def build_index(audio_dir=None, annotation_dir=None, output_file=None, audio_ext=None, ann_ext=None):
 
-    audio_files = librosa.util.get_audio_files(audio_dir, ext=audio_ext)
-    ann_files  = librosa.util.get_audio_files(annotation_dir, ext=ann_ext)
+    audio_files = librosa.util.find_files(audio_dir, ext=audio_ext)
+    ann_files  = librosa.util.find_files(annotation_dir, ext=ann_ext)
 
     if len(audio_files) != len(ann_files):
         raise Exception('Audio and annotations do not have the same number of files')

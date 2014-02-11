@@ -89,7 +89,7 @@ def translate_annotations(annotation_dir, audio_files, ann_files_orig):
 
 def build_index(data_dir=None, annotation_dir=None, output_file=None, audio_ext=None):
 
-    audio_files = librosa.util.get_audio_files(os.path.join(data_dir, 'audio'), ext=audio_ext)
+    audio_files = librosa.util.find_files(os.path.join(data_dir, 'audio'), ext=audio_ext)
     audio_files, ann_files_orig   = load_annotations(data_dir, audio_files)
 
     if len(audio_files) != len(ann_files_orig):

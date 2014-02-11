@@ -77,7 +77,7 @@ def get_track_data(t_id):
 
     boundary_beats      = []
     for time in boundary_times:
-        boundary_beats.append(  np.argmin( (boundary_times - time)**2) )
+        boundary_beats.append(  np.argmin( (analysis_mid['beat_times'] - time)**2) )
 
     boundary_beats      = np.unique(boundary_beats)
 
@@ -107,8 +107,6 @@ def learn_segmenter(model_file=None, num_jobs=1, collections=None, sigma_min=0, 
     # Step 1: build the data
     print 'Building training data... '
     train_data = get_training_data(collections)
-
-    pickle.dump(train_data, open('train_data.pickle', 'w'))
 
     # Step 2: learn the model
     print 'Fitting the model... '

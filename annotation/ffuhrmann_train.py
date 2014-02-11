@@ -94,7 +94,7 @@ def build_index(data_dir=None, annotation_dir=None, output_file=None, audio_ext=
 
     annotation_dir = os.path.abspath(annotation_dir)
 
-    audio_files = librosa.util.get_audio_files(data_dir , ext=audio_ext)
+    audio_files = librosa.util.find_files(data_dir , ext=audio_ext)
     annotations = generate_annotations(audio_files)
 
     # Store the annotations as json files
