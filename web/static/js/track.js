@@ -2,10 +2,7 @@
 // Initialize tabs
 $(document).ready(function() {
 
-
     $('.tabs').tab();
-
-    $(".tab-content").hide();
 
     $('#audio-widget').bind('timeupdate', function() { 
         track_progress(this.currentTime);
@@ -82,7 +79,7 @@ function process_analysis(analysis) {
         .text(analysis['duration'].toFixed(2) + ' seconds');
 
     $("#tuning")
-        .text((100 * analysis['tuning']).toFixed(0) + ' cents');
+        .text((analysis['tuning'] >= 0 ? '+' : '-') + (100 * analysis['tuning']).toFixed(0) + '\u00A2');
 
     draw_meta( analysis );
 
@@ -101,9 +98,9 @@ function process_analysis(analysis) {
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
 
-    $("#loading").fadeOut(0.25, function() { 
-        $(".tab-content").show();
-    });
+//     $("#loading").fadeOut(0.25, function() { 
+//         $("#analysis").removeClass('hidden');
+//     });
 }
 
 function draw_meta(values) {

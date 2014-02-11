@@ -36,7 +36,7 @@
   stroke: gray;
   fill: steelblue;
   fill-opacity: .25;
-  shape-rendering: crispEdges;
+/*   shape-rendering: crispEdges; */
 }
 
 body { padding-bottom: 70px; overflow-x: hidden; }
@@ -44,5 +44,5 @@ body { padding-bottom: 70px; overflow-x: hidden; }
 .beats      { height:   32px;       }
 .lines      { height:   140px;      }
 .zoomwindow { height:   80px;       }
-.heatmap    { height:   200px;      }
-.structplot { width:    450px;      }
+.heatmap    { height:   220px;      }
+.structplot { width:    520px;      }

@@ -18,11 +18,9 @@
         <div class="navbar-inner">
             <ul class="nav nav-tabs">
                 <li class="pull-right" style="padding-top: 6px; padding-right: 6px;">
-<!--                     <audio controls preload="auto" autobuffer id="audio-widget"> -->
                     <audio controls id="audio-widget">
                         <source src="/audio/{{ track_id }}">
                     </audio>
-
                 </li>
 
                 <li class="active">
@@ -35,47 +33,46 @@
             </ul>
         </div>
 
-        <!-- content visualization goes here -->
-        <dl class="dl-horizontal row">
-            <dt> Waveform </dt>
-            <dd id="signal" class="plot zoomwindow" />
-        </dl>
+        <div class="container col-md-12 row" id="analysis">
 
-        <div id="loading" class="container">
-            <img src="/static/i/loading.gif" alt="[...]" />
-        </div>
+            <!-- content visualization goes here -->
+            <dl class="dl-horizontal row">
+                <dt> Waveform </dt>
+                <dd id="signal" class="plot zoomwindow" />
+            </dl>
 
-        <div class="tab-content">
+            <div class="tab-content">
         
-            <div id="content" class="tab-pane active">
-                <dl class="dl-horizontal row">
-                    <dt> Beats </dt>
-                    <dd id="beats" class="plot beats" />
+                <div id="content" class="tab-pane active">
+                    <dl class="dl-horizontal row">
+                        <dt> Beats </dt>
+                        <dd id="beats" class="plot beats" />
 
-                    <dt> Pitch classes </dt>
-                    <dd id="chroma" class="plot heatmap" />
+                        <dt> Pitch classes </dt>
+                        <dd id="chroma" class="plot heatmap" />
         
-                    <dt> Pitches </dt>
-                    <dd id="cqt" class="plot heatmap" />
+                        <dt> Pitches </dt>
+                        <dd id="cqt" class="plot heatmap" />
 
-                    <dt> Tempo </dt>
-                    <dd id="tempo" class="plot beats" />
+                        <dt> Tempo </dt>
+                        <dd id="tempo" class="plot beats" />
 
-                    <dt> Tuning </dt>
-                    <dd id="tuning" class="plot beats" />
+                        <dt> Tuning </dt>
+                        <dd id="tuning" class="plot beats" />
 
-                    <dt> Duration </dt>
-                    <dd id="duration" class="plot beats" />
-                </dl>
+                        <dt> Duration </dt>
+                        <dd id="duration" class="plot beats" />
+                    </dl>
+                </div>
+
+                <div id="structure" class="tab-pane">
+                    <dl class="dl-horizontal row">
+                        <dt> Structure </dt>
+                        <dd><div id="structplot" class="structplot"></div></dd>
+                    </dl>
+                </div>
+
             </div>
-
-            <div id="structure" class="tab-pane">
-                <dl class="dl-horizontal row">
-                    <dt> Structure </dt>
-                    <dd><div id="structplot" class="structplot"></div></dd>
-                </dl>
-            </div>
-
         </div>
         
         <div class="navbar navbar-fixed-bottom navbar-inverse">
