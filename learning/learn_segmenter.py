@@ -118,3 +118,4 @@ def learn_segmenter(model_file=None, num_jobs=1, collections=None, sigma_min=0, 
 if __name__ == '__main__':
     parameters = process_arguments(sys.argv[1:])
 
+    learn_segmenter(**parameters)
