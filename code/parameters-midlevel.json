@@ -15,7 +15,7 @@
  
  "beat_neighbors":  {   "k":    5   },
 
- "segments":        {   "transformation":   null,
+ "segments":        {   "transformation":   "../models/segment_olda_beatles.npy",
                         "min_seg":          10.0,
                         "max_seg":          45.0}
 
