@@ -16,7 +16,7 @@ $.ajax({
 }).done(process_analysis);
 
 // array container for brush updates
-var brush_updates       = [];
+// var brush_updates       = [];
 var progress_updates    = [];
 
 var beat_times          = null;
@@ -56,6 +56,11 @@ function num_to_time(x) {
     return d3.format('2d')(mins) + ':' + d3.format('02d')(secs);
 }
 
+function get_colors(cmap) {
+    var c = [$('body').css('background-color')];
+    return c.concat(cmap);
+}
+
 // Render the analysis widgets
 function process_analysis(analysis) {
 
@@ -78,7 +83,7 @@ function process_analysis(analysis) {
         .text(analysis['duration'].toFixed(2) + ' seconds');
 
     $("#tuning")
-        .text((analysis['tuning'] >= 0 ? '+' : '') + (100 * analysis['tuning']).toFixed(0) + '\u00A2');
+        .text( d3.format('+.0f')(100 * analysis['tuning']) + '\u00A2');
 
     draw_meta( analysis );
 
@@ -88,11 +93,17 @@ function process_analysis(analysis) {
     draw_beats(analysis['beats']);
 
     // Plot the chromagram
-    draw_heatmap(analysis['chroma'], analysis['beats'], '#chroma');
+    draw_heatmap(analysis['chroma'], 
+                 analysis['beats'], 
+                 '#chroma', 
+                 get_colors(colorbrewer.Reds[3].slice(-1)),
+                 [0, 1]);
 
-
-    // Plot the spectrogram
-    draw_heatmap(analysis['cqt'], analysis['beats'], '#cqt');
+    // Plot the cqt
+    draw_heatmap(analysis['cqt'], 
+                    analysis['beats'], 
+                    '#cqt',
+                    get_colors(colorbrewer.Purples[5].slice(-1)));
 
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
@@ -189,7 +200,7 @@ function draw_beats(values) {
     }
     update(d3.extent(values));
 
-    brush_updates.push(update);
+    //brush_updates.push(update);
 
     var time_to_beat    = d3.scale.quantize()
                                 .domain(beats.map(function(d) { return d.time; }))
@@ -262,6 +273,7 @@ function draw_zoom(signal, duration) {
             .attr('d', line);
 
 
+    /*
     var brush = d3.svg.brush()
         .x(x)
         .on('brush', _brushed);
@@ -278,7 +290,7 @@ function draw_zoom(signal, duration) {
     .selectAll("rect")
       .attr("y", 0)
       .attr("height", height);
-
+    */
     var marker = svg.append('g');
     
     marker.append('line')
@@ -357,7 +369,7 @@ function draw_line(values, beats, target, range) {
     }
     update(d3.extent(beats)); 
 
-    brush_updates.push(update);
+//     brush_updates.push(update);
 }
 
 function flatten(X) {
@@ -371,7 +383,7 @@ function flatten(X) {
     return flat;
 }
 
-function draw_heatmap(features, beats, target, yAxis, range) {
+function draw_heatmap(features, beats, target, colormap, range, yAxis) {
 
     var margin = {left: 60, top: 0, right: 0, bottom: 40},
         width   = $('.plot').width() - margin.left - margin.right,
@@ -381,8 +393,8 @@ function draw_heatmap(features, beats, target, yAxis, range) {
 
 
     var color = d3.scale.linear()
-        .domain(range || d3.extent(flatten(features)))
-        .range([$('body').css('background'), colorbrewer.Purples[3].slice(-1)[0]])
+        .domain(range   || d3.extent(flatten(features)))
+        .range(colormap || [$('body').css('background'), colorbrewer.Purples[3].slice(-1)[0]])
         .interpolate(d3.interpolateLab);
 
     var x = d3.scale.linear()
@@ -417,7 +429,7 @@ function draw_heatmap(features, beats, target, yAxis, range) {
             .attr("height", height);
 
     var zoomers = svg.append('g').attr('clip-path', 'url(#clip)');
-    var cols = []
+    var cols = [];
 
     for (var i = 0; i < beats.length-1; i++) {
 
@@ -444,7 +456,7 @@ function draw_heatmap(features, beats, target, yAxis, range) {
     }
 
 
-    var extent = [beats[0], beats[beats.length-1]];
+    var extent = d3.extent(beats);
     function update(domain) {
         var scale = (extent[1] - extent[0]) / (domain[1] - domain[0]);
 
@@ -458,7 +470,7 @@ function draw_heatmap(features, beats, target, yAxis, range) {
     }
     update(extent);
 
-    brush_updates.push(update);
+//     brush_updates.push(update);
 
     var time_to_column = d3.scale.quantize()
                             .domain(cols.map(function(d) { return d.time; }))

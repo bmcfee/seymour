@@ -43,5 +43,5 @@ body { padding-bottom: 70px; overflow-x: hidden; }
 .beats      { height:   32px;       }
 .lines      { height:   140px;      }
 .zoomwindow { height:   80px;       }
-.heatmap    { height:   220px;      }
+.heatmap    { height:   180px;      }
 .structplot { width:    520px;      }
