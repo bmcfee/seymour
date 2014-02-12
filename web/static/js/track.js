@@ -202,12 +202,19 @@ function draw_beats(values) {
 
     //brush_updates.push(update);
 
-    var time_to_beat    = d3.scale.quantize()
-                                .domain(beats.map(function(d) { return d.time; }))
-                                .range(beats);
+//     var time_to_beat    = d3.scale.quantize()
+//                                 .domain(beats.map(function(d) { return d.time; }))
+//                                 .range(beats);
+
+    var beat_ids        = d3.range(beats.length);
+    beat_ids.push(beats.length-1);
+    beat_ids.unshift(0);
+    var time_to_beat_id = d3.scale.thershold()
+                            .domain(beats.map(function(d) { return d.time; }))
+                            .range(beat_ids);
 
     var marker = zoomable.append('rect')
-                    .datum(time_to_beat(0))
+                    .datum(time_to_beat_id(0))
                     .attr('class', 'bar')
                     .attr('y', y(0))
                     .attr('height', y.rangeBand())
@@ -216,7 +223,7 @@ function draw_beats(values) {
                     .attr('fill-opacity', '0.25');
 
     function update_marker(xpos) {
-        var b = time_to_beat(xpos);
+        var b = beats[time_to_beat_id(xpos)];
         marker.datum(b);
         marker.attr('x', x(b.time));    // get the position and width of the current beat
         marker.attr('width', x(b.duration) - x(0));
@@ -472,9 +479,16 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
 
 //     brush_updates.push(update);
 
-    var time_to_column = d3.scale.quantize()
-                            .domain(cols.map(function(d) { return d.time; }))
-                            .range(cols);
+//     var time_to_column = d3.scale.quantize()
+//                             .domain(cols.map(function(d) { return d.time; }))
+//                             .range(cols);
+
+    var col_ids = d3.range(cols.length);
+    col_ids.push(cols.length-1);
+    col_ids.unshift(0);
+    var time_to_column_id   = d3.scale.threshold()
+                                .domain(cols.map(function(d) { return d.time; }))
+                                .range(col_ids);
 
     var marker = zoomers.append('rect')
                     .attr('class', 'heatmap-bar')
@@ -488,7 +502,7 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
     function update_marker(xpos) {
         var scale = (extent[1] - extent[0]) / (x.domain()[1] - x.domain()[0]);
 
-        var b = time_to_column(xpos);
+        var b = cols[time_to_column_id(xpos)];
 
         marker.datum(b);
         marker.attr('transform', 'translate(' + x(b.time) + ',0) scale(' + scale + ',1)')
