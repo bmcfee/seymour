@@ -234,7 +234,7 @@ function draw_beats(values) {
 
     var beat_ids        = d3.range(beats.length);
     beat_ids.push(beats.length-1);
-    beat_ids.unshift(0);
+//     beat_ids.unshift(0);
     var time_to_beat_id = d3.scale.threshold()
                             .domain(beats.map(function(d) { return d.time; }))
                             .range(beat_ids);
@@ -520,7 +520,7 @@ function draw_heatmap(features, beats, target, colormap, range, y_formatter, num
 
     var col_ids = d3.range(cols.length);
     col_ids.push(cols.length-1);
-    col_ids.unshift(0);
+//     col_ids.unshift(0);
     var time_to_column_id   = d3.scale.threshold()
                                 .domain(cols.map(function(d) { return d.time; }))
                                 .range(col_ids);
