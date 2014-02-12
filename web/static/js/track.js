@@ -441,7 +441,7 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
 
         var beat_stack = zoomers.append('g').datum(my_data)
                             .attr('class', 'heatmap-bar')
-                            .attr('transform', 'translate(' + x(my_data.time) + ', 0) scale(1, 1)');
+                            .attr('transform', 'translate(' + x(my_data.time) + ', 0)');// scale(1, 1)');
 
         for (var j = 0; j < n_bins; j++) {
             beat_stack.append('rect')
@@ -465,7 +465,7 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
 
         svg.selectAll('.heatmap-bar')
                 .attr('transform', function(d) { 
-                    return 'translate(' + x(d.time) + ', 0) scale(' + scale + ', 1)'; 
+                    return 'translate(' + x(d.time) + ', 0)';// scale(' + scale + ', 1)'; 
                 } );
     }
     update(extent);
