@@ -36,7 +36,8 @@
                         <li class="dropdown">
                             <a  href="#" 
                                 class="dropdown-toggle" 
-                                data-toggle="dropdown">Collections<b class="caret"></b></a>
+                                data-toggle="dropdown">
+                                <span id="collections-count"></span> collections<b class="caret"></b></a>
                             <ul class="dropdown-menu" id="collections-menu">
                             </ul>
                         </li>
@@ -55,8 +56,14 @@
                         <input type="hidden" id="collection_id" value="{{ collection_id }}" />
                         <ul class="pager">
                             <li class="previous"><a href="#">&larr; Previous</a></li>
-                            <li> <b id="collection-name"></b> 
-                            tracks <span id="track-min"></span> to <span id="track-max"></span> of <span id="track-total"></span> </li>
+                            <li class="form-group form-inline" id='track-form'> 
+                                <label for="track-min" id="collection-name" class="form-inline"></label> 
+                                <input id="track-min" type="text" class="form-control" style="width: 4em;"> 
+                                <label for="track-max"> to </label> 
+                                <span id="track-max" type="text" class="form-control-static" style="width:
+                                4em;"></span>
+                                of <span id="track-total"></span>
+                            </li>
 
                             <li class="next"><a href="#">Next &rarr;</a></li>
                         </ul>

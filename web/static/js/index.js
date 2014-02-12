@@ -8,6 +8,22 @@ $(document).ready(function() {
     // Set the default and update the pager
     var collection_id   = parseInt($('#collection_id').val());
     get_collection(collection_id, 0, 18);
+
+    $('#track-min').change(function(eventObject) {
+        var offset = parseInt($(this).val());
+
+        if (offset < 1 || offset >=
+            parseInt($('#track_count').val())) {
+
+            $('#track-form').addClass('has-error');
+            return;
+        }
+        $('#track-form').removeClass('has-error');
+
+        var collection_id   = parseInt($('#collection_id').val());
+
+        get_collection(collection_id, offset-1, 18);
+    });
 });
 
 function dv(x, v) {
@@ -20,6 +36,8 @@ function dv(x, v) {
 
 function update_collections(collections) {
     // Clear the collections list
+    $("#collections-count").text(collections.length);
+
     $("#collections-menu > *").remove();
 
     // Populate the collections list
@@ -65,18 +83,19 @@ $('.previous').click(function() {
     var limit           = parseInt($('#limit').val());
     var collection_id   = parseInt($('#collection_id').val());
 
-    get_collection(collection_id, offset - limit, limit);
+    get_collection(collection_id, Math.max(offset - limit, 0), limit);
 });
 
 $('.next').click(function() {
     if ($(this).hasClass('disabled')) {
         return;
     }
+    var track_count     = parseInt($('#track_count').val());
     var offset          = parseInt($('#offset').val());
     var limit           = parseInt($('#limit').val());
     var collection_id   = parseInt($('#collection_id').val());
 
-    get_collection(collection_id, offset + limit, limit);
+    get_collection(collection_id, Math.min(offset + limit, track_count-1), limit);
 });
 
 function get_collection(collection_id, offset, limit) {
@@ -106,7 +125,7 @@ function get_collection(collection_id, offset, limit) {
 
             var start = 1 + offset;
             var end   = offset + tracklist.length;
-            $("#track-min").text(start);
+            $("#track-min").val(start);
             $("#track-max").text(end);
 
             for (var i in tracklist) {
