@@ -61,6 +61,31 @@ function get_colors(cmap) {
     return c.concat(cmap);
 }
 
+function format_pitch_class(d) {
+
+    var major_scale = {0: 'C', 2: 'D', 4: 'E', 5: 'F', 7: 'G', 9: 'A', 11: 'B'};
+    d = parseInt(d);
+
+    if (d in major_scale) {
+        return major_scale[d];
+    }
+
+    return null;
+}
+
+function format_pitches(d) {
+
+    var notes = ['C', 'C\u266F', 'D', 'D\u266F', 'E', 'F', 'F\u266F', 'G', 'G\u266F',
+    'A', 'A\u266F', 'B'];
+
+    d = parseInt(d);
+
+    octave = 1 + Math.floor(d / 12);
+
+    return notes[d % 12] + octave;
+}
+
+
 // Render the analysis widgets
 function process_analysis(analysis) {
 
@@ -97,13 +122,18 @@ function process_analysis(analysis) {
                  analysis['beats'], 
                  '#chroma', 
                  get_colors(colorbrewer.Reds[3].slice(-1)),
-                 [0, 1]);
+                 [0, 1],
+                 format_pitch_class, 
+                 11);
 
     // Plot the cqt
     draw_heatmap(analysis['cqt'], 
                     analysis['beats'], 
                     '#cqt',
-                    get_colors(colorbrewer.Purples[5].slice(-1)));
+                    get_colors(colorbrewer.Purples[5].slice(-1)),
+                    null,
+                    format_pitches,
+                    5);
 
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
@@ -201,10 +231,6 @@ function draw_beats(values) {
     update(d3.extent(values));
 
     //brush_updates.push(update);
-
-//     var time_to_beat    = d3.scale.quantize()
-//                                 .domain(beats.map(function(d) { return d.time; }))
-//                                 .range(beats);
 
     var beat_ids        = d3.range(beats.length);
     beat_ids.push(beats.length-1);
@@ -390,7 +416,7 @@ function flatten(X) {
     return flat;
 }
 
-function draw_heatmap(features, beats, target, colormap, range, yAxis) {
+function draw_heatmap(features, beats, target, colormap, range, y_formatter, num_ticks) {
 
     var margin = {left: 60, top: 0, right: 0, bottom: 40},
         width   = $('.plot').width() - margin.left - margin.right,
@@ -417,6 +443,12 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
                 .range([height, 0])
                 .domain([0, n_bins]);
 
+    var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient('left')
+                    .tickFormat(y_formatter || d3.format('.0f'))
+                    .ticks(num_ticks || 5);
+
     var svg = d3.select(target)
                 .append('svg')
                     .attr('width', width + margin.left + margin.right)
@@ -427,6 +459,13 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
     svg.append('g')
             .attr('class', 'x axis')
             .attr('transform', 'translate(0,' + (height + margin.top) + ')');
+
+    svg.append('g')
+            .attr('class', 'y axis')
+            .call(yAxis)
+            .attr('transform', 'translate(0,' + (margin.top - y(n_bins - 0.5)) + ')')
+            .attr('font-size', '6pt');
+
 
     svg.append("defs")
         .append("clipPath")
@@ -478,10 +517,6 @@ function draw_heatmap(features, beats, target, colormap, range, yAxis) {
     update(extent);
 
 //     brush_updates.push(update);
-
-//     var time_to_column = d3.scale.quantize()
-//                             .domain(cols.map(function(d) { return d.time; }))
-//                             .range(cols);
 
     var col_ids = d3.range(cols.length);
     col_ids.push(cols.length-1);

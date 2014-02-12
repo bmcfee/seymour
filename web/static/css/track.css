@@ -39,8 +39,8 @@
 }
 
 body { padding-bottom: 70px; overflow-x: hidden; }
-.plot       { width:    80%;        }
-.beats      { height:   32px;       }
+.plot       { width:    80%;  margin:4px; padding: 4px;}
+.beats      { height:   40px;       }
 .lines      { height:   140px;      }
 .zoomwindow { height:   80px;       }
 .heatmap    { height:   180px;      }
