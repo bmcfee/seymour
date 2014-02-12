@@ -138,6 +138,13 @@ function process_analysis(analysis) {
     // Draw the structure bundle
     draw_structure(analysis['beats'], analysis['links'], analysis['segments'], '#structplot');
 
+    // Setup time-jump events
+    $('.heatmap-bar,.bar').on('click', function(eventObject) {
+        var time = $(this)[0].__data__.time;
+        
+        $('#audio-widget')[0].currentTime = time;
+
+    });
 }
 
 function draw_meta(values) {
@@ -500,7 +507,6 @@ function draw_heatmap(features, beats, target, colormap, range, y_formatter, num
         }
 
     }
-
 
     var extent = d3.extent(beats);
     function update(domain) {
