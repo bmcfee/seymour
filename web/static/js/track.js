@@ -209,7 +209,7 @@ function draw_beats(values) {
     var beat_ids        = d3.range(beats.length);
     beat_ids.push(beats.length-1);
     beat_ids.unshift(0);
-    var time_to_beat_id = d3.scale.thershold()
+    var time_to_beat_id = d3.scale.threshold()
                             .domain(beats.map(function(d) { return d.time; }))
                             .range(beat_ids);
 
