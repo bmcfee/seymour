@@ -38,7 +38,7 @@
   fill-opacity: .25;
 }
 
-body { padding-bottom: 70px; overflow-x: hidden; }
+body { overflow-x: hidden; }
 .plot       { width:    80%;  margin:4px; padding: 4px;}
 .beats      { height:   40px;       }
 .lines      { height:   140px;      }

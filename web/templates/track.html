@@ -15,13 +15,20 @@
     </head>
 
     <body>
-        <div class="navbar-inner">
+<!--         <div class="navbar-inner"> -->
+        <div class="navbar navbar-inner">
             <ul class="nav nav-tabs">
                 <li class="pull-right" style="padding-top: 6px; padding-right: 6px;">
                     <audio controls id="audio-widget">
                         <source src="/audio/{{ track_id }}">
                     </audio>
                 </li>
+
+                <li class="navbar-text"><strong><span id="track_title"></span></strong></li>
+                <li class="divider-vertical" />
+                <li class="navbar-text"><span id="track_artist"></span></li>
+                <li class="divider-vertical" />
+                <li class="navbar-text"><span id="track_album"></span></li>
 
                 <li class="active">
                     <a href="#content" data-toggle="tab">Content</a>
@@ -73,19 +80,6 @@
                 </div>
 
             </div>
-        </div>
-        
-        <div class="navbar navbar-fixed-bottom navbar-inverse">
-            <ul class="nav">
-                <li class="navbar-text"><strong><span id="track_title"></span></strong></li>
-                <li class="divider-vertical" />
-                <li class="navbar-text"><span id="track_artist"></span></li>
-                <li class="divider-vertical" />
-                <li class="navbar-text"><span id="track_album"></span></li>
-                <li class="divider-vertical" />
-                <li class="navbar-text"><span id="track_date"></span></li>
-            </ul>
-
         </div>
 
         <input type="hidden" id="track_id" value="{{ track_id }}" />

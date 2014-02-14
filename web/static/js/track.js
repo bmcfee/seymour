@@ -151,7 +151,7 @@ function draw_meta(values) {
 
     var title   = 'n/a';
     var artist  = 'n/a';
-    var album   = 'n/a';
+    var album   = '';
 
     if (values['title'])    {  title = values['title'];      }
     if (values['artist'])   {  artist = values['artist'];    }
