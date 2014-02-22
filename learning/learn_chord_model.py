@@ -59,12 +59,12 @@ def make_training_data(collection):
     for t in tracks:
         track = seymour.get_track(t)
 
-        if not ('librosa:mid_level' in track.annotation_dict and
+        if not ('librosa:mid-level' in track.annotation_dict and
             'chords' in track.annotation_dict):
             continue
 
         # Get the features
-        chroma, beat_times = midlevel_to_beat_chroma(track.annotation_dict['librosa:mid_level'])
+        chroma, beat_times = midlevel_to_beat_chroma(track.annotation_dict['librosa:mid-level'])
 
         # Get the labels
         chord_times, chord_labels = mir_eval.io.load_annotation(track.annotation_dict['chords'])
@@ -107,8 +107,6 @@ def save_model(chord_hmm, model_file):
     with open(model_file, 'w') as f:
         pickle.dump(chord_hmm, f, protocol=-1)
 
-
-
 def build_model(collection=None, model_file=None, emission_model=None):
 
     # 1: get the training data
@@ -125,7 +123,6 @@ def build_model(collection=None, model_file=None, emission_model=None):
     # 3: save the model
     print '[3/3] Saving the model.'
     save_model(chord_hmm, model_file)
-
 
 if __name__ == '__main__':
     args = process_arguments(sys.argv[1:])
