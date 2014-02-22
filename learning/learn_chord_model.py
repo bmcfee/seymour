@@ -120,7 +120,7 @@ def build_model(collection=None, model_file=None, emission_model=None):
     alphabet = alphabet_minmaj()
     
     chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
-    chord_hmm.train(obs, labs)
+    chord_hmm.fit(obs, labs)
 
     # 3: save the model
     print '[3/3] Saving the model.'
