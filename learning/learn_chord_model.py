@@ -131,7 +131,7 @@ def test(chord_hmm, obs, labs):
 def train(alphabet, obs, labs, num_folds=5, emission_model=None):
 
     # Cross-validation
-    for fold, (idx_train, idx_test) in enumerate(len(obs), n_folds=sklearn.cross_validation.KFold(num_folds)):
+    for fold, (idx_train, idx_test) in enumerate(n_folds=sklearn.cross_validation.KFold(len(obs), n_folds=num_folds)):
 
         # Slice the training data
         obs_train   = [obs[i]   for i in idx_train]
