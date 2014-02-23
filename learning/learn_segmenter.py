@@ -110,17 +110,18 @@ def score_example(W, features=None, k_min=None, k_max=None, beat_times=None, bou
     # Make sure the beat times cover the entire range, pad
     beat_times = np.unique(np.concatenate([beat_times, [boundary_times[-1]]]))
 
+    # Tack on the track duration to the end
     predicted_times = beat_times[seg_predict_tree[best_idx]]
 
-    # Tack on the track duration to the end
-    predicted_times = mir_eval.util.adjust_times(predicted_times, 
-                                                 t_min=0.0,
-                                                 t_max=boundary_times[-1])[0]
-
-    # Compute the score, pull off the f-measure
     # Convert to intervals
     ref_intervals = mir_eval.util.boundaries_to_intervals(boundary_times)[0]
     est_intervals = mir_eval.util.boundaries_to_intervals(predicted_times)[0]
+
+    est_intervals = mir_eval.util.adjust_intervals(est_intervals, 
+                                                   t_min=0.0,
+                                                   t_max=ref_intervals[-1, -1])[0]
+
+    # Compute the score, pull off the f-measure
     score = mir_eval.segment.boundary_detection(ref_intervals, est_intervals)[-1]
     return score
 
