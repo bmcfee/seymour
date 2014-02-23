@@ -138,7 +138,7 @@ def train(alphabet, obs, labs, num_folds=5, emission_model=None):
         chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
         chord_hmm.fit(obs_train, labs_train)
         
-        print 'Fold: ' % fold
+        print 'Fold: ', fold
         print '\t Train: ', test(chord_hmm, obs_train, labs_train)
 
         obs_test    = [obs[i]   for i in idx_test]
