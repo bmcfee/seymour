@@ -89,6 +89,7 @@ def process_arguments(args):
     
     parser.add_argument('collection',
                         action  =   'store',
+                        type    =   unicode,
                         help    =   'Gordon collection to use for training')
 
     parser.add_argument('model_file',
@@ -121,8 +122,9 @@ def test(chord_hmm, obs, labs):
     y_pred = []
     y_true = []
     for o, l in zip(obs, labs):
-        y_pred.extend(chord_hmm.decode(o))
-        y_true.extend([chord_hmm.chord_to_id_[y] for y in l])
+        for y_t, y_p in zip(l, chord_hmm.predict_chords(o)):
+            y_true.append(chord_hmm.chord_to_id_[y_t])
+            y_pred.append(chord_hmm.chord_to_id_[y_p])
 
     return sklearn.metrics.accuracy_score(y_true, y_pred)
 
