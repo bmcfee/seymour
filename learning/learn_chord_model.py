@@ -6,6 +6,8 @@ import librosa
 import mir_eval
 import sys
 import numpy as np
+import sklearn.metrics
+import sklearn.cross_validation
 import cPickle as pickle
 import seymour
 
@@ -93,6 +95,12 @@ def process_arguments(args):
                         action  =   'store',
                         help    =   'Path to store the model file')
 
+    parser.add_argument('-n', '--num-folds',
+                        dest    =   'num_folds',
+                        type    =   int,
+                        default =   5,
+                        help    =   'Number of validation folds')
+
     parser.add_argument('-e', '--emission',
                         dest    =   'emission_model',
                         type    =   str,
@@ -107,7 +115,44 @@ def save_model(chord_hmm, model_file):
     with open(model_file, 'w') as f:
         pickle.dump(chord_hmm, f, protocol=-1)
 
-def build_model(collection=None, model_file=None, emission_model=None):
+def test(chord_hmm, obs, labs):
+
+    # Evaluate how well we did
+    y_pred = []
+    y_true = []
+    for o, l in zip(obs, labs):
+        y_pred.extend(chord_hmm.decode(o))
+        y_true.extend([chord_hmm.chord_to_id_[y] for y in l])
+
+    return sklearn.metrics.accuracy_score(y_true, y_pred)
+
+def train(alphabet, obs, labs, num_folds=5, emission_model=None):
+
+    # Cross-validation
+    for fold, (idx_train, idx_test) in enumerate(sklearn.cross_validation.KFold(num_folds)):
+
+        # Slice the training data
+        obs_train   = [obs[i]   for i in idx_train]
+        labs_train  = [labs[i]  for i in idx_train]
+
+        chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
+        chord_hmm.fit(obs_train, labs_train)
+        
+        print 'Fold: ' % fold
+        print '\t Train: ', test(chord_hmm, obs_train, labs_train)
+
+        obs_test    = [obs[i]   for i in idx_test]
+        labs_test   = [labs[i]  for i in idx_test]
+
+        print '\t Test: ', test(chord_hmm, obs_test, labs_test)
+
+    chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
+    chord_hmm.fit(obs, labs)
+    print 'Full: '
+    print '\t Train: ', test(chord_hmm, obs, labs)
+    return chord_hmm
+
+def build_model(collection=None, model_file=None, num_folds=None, emission_model=None):
 
     # 1: get the training data
     print '[1/3] Building the training data... '
@@ -117,8 +162,7 @@ def build_model(collection=None, model_file=None, emission_model=None):
     print '[2/3] Training the model... '
     alphabet = alphabet_minmaj()
     
-    chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
-    chord_hmm.fit(obs, labs)
+    chord_hmm = train(alphabet, obs, labs, num_folds=num_folds, emission_model=emission_model)
 
     # 3: save the model
     print '[3/3] Saving the model.'
