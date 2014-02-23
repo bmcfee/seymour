@@ -36,7 +36,7 @@ def midlevel_to_beat_chroma(midlevel_file):
     # Wrap to chroma
     cq_to_chroma = librosa.filters.cq_to_chroma(cqt.shape[0])
 
-    chroma = librosa.util.normalize(cq_to_chroma.dot(cqt**2))
+    chroma = librosa.util.normalize(cq_to_chroma.dot(cqt))
 
     # Compute log-chroma
     log_chroma = librosa.logamplitude(chroma, ref_power=chroma.max())
