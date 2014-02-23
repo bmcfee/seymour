@@ -131,7 +131,7 @@ def test(chord_hmm, obs, labs):
 def train(alphabet, obs, labs, num_folds=5, emission_model=None):
 
     # Cross-validation
-    for fold, (idx_train, idx_test) in enumerate(sklearn.cross_validation.KFold(num_folds)):
+    for fold, (idx_train, idx_test) in enumerate(len(obs), n_folds=sklearn.cross_validation.KFold(num_folds)):
 
         # Slice the training data
         obs_train   = [obs[i]   for i in idx_train]
@@ -141,17 +141,17 @@ def train(alphabet, obs, labs, num_folds=5, emission_model=None):
         chord_hmm.fit(obs_train, labs_train)
         
         print 'Fold: ', fold
-        print '\t Train: ', test(chord_hmm, obs_train, labs_train)
+        print '\t Train: %.3f' % test(chord_hmm, obs_train, labs_train)
 
         obs_test    = [obs[i]   for i in idx_test]
         labs_test   = [labs[i]  for i in idx_test]
 
-        print '\t Test: ', test(chord_hmm, obs_test, labs_test)
+        print '\t Test:  %.3f' % test(chord_hmm, obs_test, labs_test)
 
     chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
     chord_hmm.fit(obs, labs)
     print 'Full: '
-    print '\t Train: ', test(chord_hmm, obs, labs)
+    print '\t Train: %.3f' % test(chord_hmm, obs, labs)
     return chord_hmm
 
 def build_model(collection=None, model_file=None, num_folds=None, emission_model=None):
