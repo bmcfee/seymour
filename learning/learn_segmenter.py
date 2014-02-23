@@ -118,7 +118,10 @@ def score_example(W, features=None, k_min=None, k_max=None, beat_times=None, bou
                                                  t_max=boundary_times[-1])[0]
 
     # Compute the score, pull off the f-measure
-    score = mir_eval.segment.frame_clustering_nce(boundary_times, predicted_times)[-1]
+    # Convert to intervals
+    ref_intervals = mir_eval.util.boundaries_to_intervals(boundary_times)[0]
+    est_intervals = mir_eval.util.boundaries_to_intervals(predicted_times)[0]
+    score = mir_eval.segment.boundary_detection(ref_intervals, est_intervals)[-1]
     return score
 
 def fit_model(train_data, num_jobs=1, sigma_min=0, sigma_max=9):
