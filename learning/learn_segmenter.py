@@ -87,7 +87,7 @@ def get_track_data(t_id):
         # Find the first beat that maps to this segment
         hits = np.argwhere(beat_segment_ids == i)
         if len(hits) > 0:
-            boundary_beats.append( hits[0] )
+            boundary_beats.append( hits[0].asscalar() )
 
     boundary_beats = np.unique(boundary_beats)
 
