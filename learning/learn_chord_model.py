@@ -81,7 +81,7 @@ def make_training_data(collection):
         labs.append(beat_labels)
         ref_times.append(chord_times)
         ref_labs.append(chord_labels)
-        names.append(track.title)
+        names.append(track.ofilename)
 
     return obs, times, labs, ref_times, ref_labs, names
 
