@@ -2,6 +2,7 @@
 # CREATED:2014-02-11 12:07:54 by Brian McFee <brm2132@columbia.edu>
 #  Gordon-backed implementation of OLDA learning
 
+import librosa
 import argparse
 import sys
 from joblib import Parallel, delayed
@@ -74,11 +75,21 @@ def get_track_data(t_id):
                                                      analysis_mid['PARAMETERS']['segments']['min_seg'],
                                                      analysis_mid['PARAMETERS']['segments']['max_seg'])
 
-    boundary_beats      = []
-    for time in boundary_times:
-        boundary_beats.append(  np.argmin( (analysis_mid['beat_times'] - time)**2) )
+    # Construct beat intervals
+    beat_intervals = np.asarray(zip(analysis_mid['beat_times'][:-1], 
+                                    analysis_mid['beat_times'][1:]))
 
-    boundary_beats      = np.unique(boundary_beats)
+    # Match beat intervals to segments
+    beat_segment_ids = librosa.util.match_intervals(beat_intervals, segments)
+        
+    boundary_beats      = []
+    for i, seg in enumerate(segments):
+        # Find the first beat that maps to this segment
+        hits = np.argwhere(beat_segment_ids == i)
+        if len(hits) > 0:
+            boundary_beats.append( hits[0] )
+
+    boundary_beats = np.unique(boundary_beats)
 
     return {'features': features,
             'k_min':    k_min,
@@ -102,7 +113,7 @@ def get_training_data(collection_names):
     return data
 
 def score_example(W, features=None, k_min=None, k_max=None, beat_times=None, boundary_times=None, boundary_beats=None):
-    '''Compute the NCE F-measure score for an example'''
+    '''Compute the boundary detection F-measure score for an example'''
 
     # Do the full prediction
     seg_predict_tree, best_idx = midlevel.get_segments(W.dot(features), k_min, k_max)
