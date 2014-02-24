@@ -57,7 +57,8 @@ def make_training_data(collection):
     labs        = []
     ref_times   = []
     ref_labs    = []
-    
+    names       = []
+
     for t in tracks:
         track = seymour.get_track(t)
 
@@ -80,8 +81,9 @@ def make_training_data(collection):
         labs.append(beat_labels)
         ref_times.append(chord_times)
         ref_labs.append(chord_labels)
+        names.append(track.title)
 
-    return obs, times, labs, ref_times, ref_labs
+    return obs, times, labs, ref_times, ref_labs, names
 
 def process_arguments(args):
 
@@ -154,11 +156,26 @@ def train(alphabet, obs, labs, num_folds=5, emission_model=None):
     print '\t Train: %.3f' % test(chord_hmm, obs, labs)
     return chord_hmm
 
+def save_predictions(chord_hmm, obs, times, labs, ref_times, ref_labs, names):
+
+    predictions = []
+    for i in range(len(obs)):
+        est = chord_hmm.predict_chords(obs[i])
+        predictions.append({'name': names[i], 
+                            'beat_times': times[i], 
+                            'true_labels': labs[i], 
+                            'estimated_labels': est})
+
+    data = {'model': chord_hmm, 'predictions': predictions}
+
+    with open('diagnostics.pickle', 'w') as f:
+        pickle.dump(data, f)
+
 def build_model(collection=None, model_file=None, num_folds=None, emission_model=None):
 
     # 1: get the training data
     print '[1/3] Building the training data... '
-    obs, times, labs, ref_times, ref_labs = make_training_data(collection)
+    obs, times, labs, ref_times, ref_labs, names = make_training_data(collection)
 
     # 2: train the model
     print '[2/3] Training the model... '
@@ -169,6 +186,9 @@ def build_model(collection=None, model_file=None, num_folds=None, emission_model
     # 3: save the model
     print '[3/3] Saving the model.'
     save_model(chord_hmm, model_file)
+
+    print '[4/3] Saving diagnostic predictions'
+    save_predictions(chord_hmm, obs, times, labs, ref_times, ref_labs, names)
 
 if __name__ == '__main__':
     args = process_arguments(sys.argv[1:])
