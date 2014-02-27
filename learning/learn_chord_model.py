@@ -62,8 +62,7 @@ def make_training_data(collection):
     for t in tracks:
         track = seymour.get_track(t)
 
-        if not ('librosa:mid-level' in track.annotation_dict and
-            'chords' in track.annotation_dict):
+        if not ('librosa:mid-level' in track.annotation_dict and 'chords' in track.annotation_dict):
             continue
 
         # Get the features
@@ -104,6 +103,12 @@ def process_arguments(args):
                         default =   5,
                         help    =   'Number of validation folds')
 
+    parser.add_argument('-p', '--prior',
+                        dest    =   'prior',
+                        type    =   float,
+                        default =   1e-2,
+                        help    =   'Covariance prior')
+
     parser.add_argument('-e', '--emission',
                         dest    =   'emission_model',
                         type    =   str,
@@ -130,7 +135,7 @@ def test(chord_hmm, obs, labs):
 
     return sklearn.metrics.accuracy_score(y_true, y_pred)
 
-def train(alphabet, obs, labs, num_folds=5, emission_model=None):
+def train(alphabet, obs, labs, num_folds=5, emission_model=None, prior=None):
 
     # Cross-validation
     for fold, (idx_train, idx_test) in enumerate(sklearn.cross_validation.KFold(len(obs), n_folds=num_folds)):
@@ -139,7 +144,7 @@ def train(alphabet, obs, labs, num_folds=5, emission_model=None):
         obs_train   = [obs[i]   for i in idx_train]
         labs_train  = [labs[i]  for i in idx_train]
 
-        chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model)
+        chord_hmm = librosa.chord.ChordHMM(alphabet, covariance_type=emission_model, covars_prior=prior)
         chord_hmm.fit(obs_train, labs_train)
         
         print 'Fold: ', fold
@@ -171,7 +176,7 @@ def save_predictions(chord_hmm, obs, times, labs, ref_times, ref_labs, names):
     with open('diagnostics.pickle', 'w') as f:
         pickle.dump(data, f)
 
-def build_model(collection=None, model_file=None, num_folds=None, emission_model=None):
+def build_model(collection=None, model_file=None, num_folds=None, emission_model=None, prior=None):
 
     # 1: get the training data
     print '[1/3] Building the training data... '
@@ -181,7 +186,7 @@ def build_model(collection=None, model_file=None, num_folds=None, emission_model
     print '[2/3] Training the model... '
     alphabet = alphabet_minmaj()
     
-    chord_hmm = train(alphabet, obs, labs, num_folds=num_folds, emission_model=emission_model)
+    chord_hmm = train(alphabet, obs, labs, num_folds=num_folds, emission_model=emission_model, prior=prior)
 
     # 3: save the model
     print '[3/3] Saving the model.'
