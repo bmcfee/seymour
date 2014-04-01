@@ -4,7 +4,6 @@
 # Core dependencies
 import argparse, sys
 import numpy as np
-import scipy
 import cPickle as pickle
 
 import librosa
@@ -18,33 +17,21 @@ from Whitening          import Whitening
 from HartiganOnline     import HartiganOnline
 from VectorQuantizer    import VectorQuantizer
 
-def local_contrast(S, widths=None):
-    '''Get local contrast spectrogram features from a track id'''
+def delta_features(S, widths=None):
+    '''Get log-mel-delta's from a librosa low-level analysis'''
 
-    # Build the local difference mapping
-    def make_contrast_features(X, widths=widths):
-        """helper function to build contrast features"""
-        Xhat = X
-    
-        for w in widths:
-            Xhat = np.vstack((Xhat, scipy.signal.lfilter(np.ones(w) / w, 1, X, axis=-1)))
-        
-        return Xhat
-    
-    if widths is None:
-        widths = []
+    S = librosa.logamplitude(S)
+    S_delta = librosa.feature.delta(S)
+    S_delta2 = librosa.feature.delta(S_delta)
 
-    # Get the mel spectrogram, convert to log power
-    S = librosa.logamplitude(S, ref_power=S.max())
-    
-    return make_contrast_features(S, widths=widths)
+    return np.vstack([S, S_delta, S_delta2])
 
 def feature_stream(track_id, n=50, transform=None):
     """The datastream object's feature generator. 
     Takes a track id, and generates samples of its feature content"""
     
     # Get the features
-    features    = local_contrast(seymour.get_analysis(track_id, 
+    features    = delta_features(seymour.get_analysis(track_id, 
                                                       'librosa:low-level')['mel_spectrogram'])
     
     if transform is not None:
