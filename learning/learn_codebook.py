@@ -6,33 +6,25 @@ import argparse, sys
 import numpy as np
 import cPickle as pickle
 
-import librosa
 import seymour
+import seymour_analyzers.librosa_lowlevel as lowlevel
+import seymour_analyzers.librosa_midlevel as midlevel
 
 # Learn OOC is the glue that allows sequential learning (sklearn) from generator functions
 # Whitening, Hartigan, and VQ are all sklearn modules for whitening transformations, 
 # online clustering, and vector quantization
 import learn_ooc
-from Whitening          import Whitening
-from HartiganOnline     import HartiganOnline
-from VectorQuantizer    import VectorQuantizer
+from seymour_analyzers.Whitening          import Whitening
+from seymour_analyzers.HartiganOnline     import HartiganOnline
+from seymour_analyzers.VectorQuantizer    import VectorQuantizer
 
-def delta_features(S):
-    '''Get log-mel-delta's from a librosa low-level analysis'''
-
-    S = librosa.logamplitude(S)
-    S_delta = librosa.feature.delta(S)
-    S_delta2 = librosa.feature.delta(S_delta)
-
-    return np.vstack([S, S_delta, S_delta2])
 
 def feature_stream(track_id, n=50, transform=None):
     """The datastream object's feature generator. 
     Takes a track id, and generates samples of its feature content"""
     
     # Get the features
-    features    = delta_features(seymour.get_analysis(track_id, 
-                                                      'librosa:low-level')['mel_spectrogram'])
+    features = midlevel.delta_features(seymour.get_analysis(track_id, lowlevel.__description__))
     
     if transform is not None:
         features = transform.transform(features.T).T
@@ -98,7 +90,7 @@ def save_results(outfile, transformer, encoder, args):
                      'encoder': encoder,
                      'args': args}, f, protocol=-1)
 
-def learn_codebook(collection, n_codewords=2048, working_size=256, max_iter=1, n_samples=64, buffer_size=8192):
+def learn_codebook(collection, n_codewords, working_size, max_iter, n_samples, buffer_size):
     """Learn the feature transformation"""
 
     # Get the collection's tracks

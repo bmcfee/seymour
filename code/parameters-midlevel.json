@@ -20,6 +20,6 @@
                         "max_seg":          45.0},
 
  "encoder":        {    "transformation":   "../models/vq_codebook.npy",
-                        "n_quantizerz":     8}
+                        "n_quantizers":     8}
 
 }
