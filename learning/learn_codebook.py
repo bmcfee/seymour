@@ -17,7 +17,7 @@ from Whitening          import Whitening
 from HartiganOnline     import HartiganOnline
 from VectorQuantizer    import VectorQuantizer
 
-def delta_features(S, widths=None):
+def delta_features(S):
     '''Get log-mel-delta's from a librosa low-level analysis'''
 
     S = librosa.logamplitude(S)
@@ -40,42 +40,6 @@ def feature_stream(track_id, n=50, transform=None):
     for i in range(n):
         t = np.random.randint(0, features.shape[1])
         yield features[:, t]
-
-def learn_codebook(collection, n_codewords=2048, working_size=256, max_iter=1, n_samples=64, buffer_size=8192):
-    """Learn the feature transformation"""
-
-    # Get the collection's tracks
-    tracks = seymour.get_collection_tracks(collection)
-
-    print 'Learning from collection [%s], %d tracks' % (collection, len(tracks))
-
-    print 'Learning the feature scaling... '
-    # Create a data stream to learn a whitening transformer
-    data_stream = learn_ooc.mux_bounded(feature_stream, 
-                                        [t for t in tracks], 
-                                        working_size=working_size, 
-                                        max_iter=max_iter, 
-                                        n=n_samples)
-
-    # Build the whitening transform
-    transformer = Whitening()
-    learn_ooc.fit(transformer, data_stream, batch_size=buffer_size)
-
-    print 'Learning the codebook... '
-    # Create a new data stream that uses the whitener prior to running k-means
-    # This could also be done with a sklearn.pipeline, probably?
-    data_stream = learn_ooc.mux_bounded(feature_stream, 
-                                        [t for t in tracks], 
-                                        working_size=working_size, 
-                                        max_iter=max_iter, 
-                                        n=n_samples, 
-                                        transform=transformer)
-
-    # Build the codebook estimator. 
-    encoder = VectorQuantizer(clusterer=HartiganOnline(n_clusters=n_codewords))
-    learn_ooc.fit(encoder, data_stream, batch_size=buffer_size)
-
-    return transformer, encoder
 
 def get_parameters():
 
@@ -133,6 +97,42 @@ def save_results(outfile, transformer, encoder, args):
         pickle.dump({'transformer': transformer,
                      'encoder': encoder,
                      'args': args}, f, protocol=-1)
+
+def learn_codebook(collection, n_codewords=2048, working_size=256, max_iter=1, n_samples=64, buffer_size=8192):
+    """Learn the feature transformation"""
+
+    # Get the collection's tracks
+    tracks = seymour.get_collection_tracks(collection)
+
+    print 'Learning from collection [%s], %d tracks' % (collection, len(tracks))
+
+    print 'Learning the feature scaling... '
+    # Create a data stream to learn a whitening transformer
+    data_stream = learn_ooc.mux_bounded(feature_stream, 
+                                        [t for t in tracks], 
+                                        working_size=working_size, 
+                                        max_iter=max_iter, 
+                                        n=n_samples)
+
+    # Build the whitening transform
+    transformer = Whitening()
+    learn_ooc.fit(transformer, data_stream, batch_size=buffer_size)
+
+    print 'Learning the codebook... '
+    # Create a new data stream that uses the whitener prior to running k-means
+    # This could also be done with a sklearn.pipeline, probably?
+    data_stream = learn_ooc.mux_bounded(feature_stream, 
+                                        [t for t in tracks], 
+                                        working_size=working_size, 
+                                        max_iter=max_iter, 
+                                        n=n_samples, 
+                                        transform=transformer)
+
+    # Build the codebook estimator. 
+    encoder = VectorQuantizer(clusterer=HartiganOnline(n_clusters=n_codewords))
+    learn_ooc.fit(encoder, data_stream, batch_size=buffer_size)
+
+    return transformer, encoder
 
 if __name__ == '__main__':
     args = get_parameters()

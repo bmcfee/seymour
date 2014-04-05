@@ -49,6 +49,7 @@ def get_feature_names():
             'beat_neighbors',
             'repetition_mfcc',
             'repetition_chroma',
+            'vq',
             'segments']
 
 #-- Feature analysis guts
@@ -139,6 +140,15 @@ def get_repetition_features(X, n_steps, metric, width, kernel_size, n_factors):
 
     return compress_features(L, n_factors)
 
+def delta_features(lowlevel):
+    '''Log-mel power delta features'''
+
+    M0 = librosa.logamplitude(lowlevel['mel_spectrogram'])
+    M1 = librosa.feature.delta(M0)
+    M2 = librosa.feature.delta(M1)
+
+    return np.vstack([M0, M1, M2])
+
 #-- Segmentation guts
 def __gaussian_cost(X):
     '''Return the average log-likelihood of data under a standard normal'''
@@ -220,6 +230,25 @@ def get_segment_features(analysis, lowlevel, transformation_path):
 
     W = np.load(transformation_path)
     return W.dot(X)
+
+#-- Vector quantizer guts
+def encoder_model(model_path, n_quantizers):
+
+    with open(model_path, 'r') as f:
+        data = pickle.load(f)
+
+
+    whitener    = data['transformer']
+    encoder     = data['encoder']
+    parameters  = data['args']
+    parameters['n_quantizers'] = n_quantizers
+
+    encoder.n_quantizers = n_quantizers
+
+    return whitener, encoder, parameters
+
+def encode_features(features, whitener, encoder):
+    return encoder.transform(whitener.transform(features.T)).T
 
 #-- Full feature extractor
 def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
@@ -329,6 +358,22 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
 
         # Just to make it easy, copy over the best segmentation
         analysis['segment_times'] = analysis['segment_time_tree'][analysis['segments_best']]
+
+    if 'vq' in features:
+        # Load the transformer
+        whitener, encoder, args     = encoder_model(PARAMETERS['encoder']['transformation'], 
+                                                    PARAMETERS['encoder']['n_quantizers'])
+
+        features                    = delta_features(lowlevel)
+        analysis['frame_vq']        = encode_features(features, whitener, encoder)
+        analysis['vq_parameters']   = args
+        dense_code                  = analysis['frame_vq'].toarray()
+        analysis['onset_sync_vq']   = librosa.feature.sync(dense_code, onset_frames)
+        analysis['beat_sync_vq']    = librosa.feature.sync(dense_code, beat_frames)
+        analysis['track_vq']        = np.mean(dense_code, axis=1)
+
+        
+    # Construct a dense representation for summarization purposes
 
 
     PREV = analysis.get('PREVIOUS', {})

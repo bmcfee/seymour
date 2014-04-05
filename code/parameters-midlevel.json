@@ -17,6 +17,9 @@
 
  "segments":        {   "transformation":   "../models/segment_olda_beatles.npy",
                         "min_seg":          10.0,
-                        "max_seg":          45.0}
+                        "max_seg":          45.0},
+
+ "encoder":        {    "transformation":   "../models/vq_codebook.npy",
+                        "n_quantizerz":     8}
 
 }
