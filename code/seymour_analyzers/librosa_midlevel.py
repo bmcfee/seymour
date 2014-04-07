@@ -364,13 +364,13 @@ def analyze_features(input_file, features=None, analysis=None, PARAMETERS=None):
         whitener, encoder, args     = encoder_model(PARAMETERS['encoder']['transformation'], 
                                                     PARAMETERS['encoder']['n_quantizers'])
 
-        features                    = delta_features(lowlevel)
-        analysis['frame_vq']        = encode_features(features, whitener, encoder)
+        lmdeltas                    = delta_features(lowlevel)
+        analysis['frame_vq']        = encode_features(lmdeltas, whitener, encoder)
         analysis['vq_parameters']   = args
-        dense_code                  = analysis['frame_vq'].toarray()
-        analysis['onset_sync_vq']   = librosa.feature.sync(dense_code, onset_frames)
-        analysis['beat_sync_vq']    = librosa.feature.sync(dense_code, beat_frames)
-        analysis['track_vq']        = np.mean(dense_code, axis=1)
+        dense_code                  = analysis['frame_vq'].toarray().astype(np.float32)
+        analysis['onset_sync_vq']   = librosa.feature.sync(dense_code, onset_frames).astype(np.float32)
+        analysis['beat_sync_vq']    = librosa.feature.sync(dense_code, beat_frames).astype(np.float32)
+        analysis['track_vq']        = np.mean(dense_code, axis=1).astype(np.float32)
 
         
     # Construct a dense representation for summarization purposes
