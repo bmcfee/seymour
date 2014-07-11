@@ -110,7 +110,7 @@ def learn_codebook(collection, n_codewords, working_size, max_iter, n_samples, b
     print 'Learning the codebook... '
     # Create a new data stream that uses the whitener prior to running k-means
     # This could also be done with a sklearn.pipeline, probably?
-    seeds = [pescador.Streamer(feature_stream, t, transformer=transformer) for t in tracks]
+    seeds = [pescador.Streamer(feature_stream, t, transform=transformer) for t in tracks]
     mux_stream = pescador.mux(seeds, max_iter, working_size, lam=n_samples)
 
     # Build the codebook estimator. 
