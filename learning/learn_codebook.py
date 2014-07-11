@@ -13,7 +13,7 @@ import seymour_analyzers.librosa_midlevel as midlevel
 # Learn OOC is the glue that allows sequential learning (sklearn) from generator functions
 # Whitening, Hartigan, and VQ are all sklearn modules for whitening transformations, 
 # online clustering, and vector quantization
-import learn_ooc
+import pescador
 from seymour_analyzers.Whitening          import Whitening
 from seymour_analyzers.HartiganOnline     import HartiganOnline
 from seymour_analyzers.VectorQuantizer    import VectorQuantizer
@@ -100,30 +100,24 @@ def learn_codebook(collection, n_codewords, working_size, max_iter, n_samples, b
 
     print 'Learning the feature scaling... '
     # Create a data stream to learn a whitening transformer
-    data_stream = learn_ooc.mux_bounded(feature_stream, 
-                                        [t for t in tracks], 
-                                        working_size=working_size, 
-                                        max_iter=max_iter, 
-                                        n=n_samples)
+    seeds = [pescador.Streamer(feature_stream, t) for t in tracks]
+    mux_stream = pescador.mux(seeds, max_iter, working_size, lam=n_samples)
 
     # Build the whitening transform
-    transformer = Whitening()
-    learn_ooc.fit(transformer, data_stream, batch_size=buffer_size)
+    transformer = pescador.StreamLearner(Whitening(), batch_size=buffer_size)
+    transformer.iter_fit(mux_stream)
 
     print 'Learning the codebook... '
     # Create a new data stream that uses the whitener prior to running k-means
     # This could also be done with a sklearn.pipeline, probably?
-    data_stream = learn_ooc.mux_bounded(feature_stream, 
-                                        [t for t in tracks], 
-                                        working_size=working_size, 
-                                        max_iter=max_iter, 
-                                        n=n_samples, 
-                                        transform=transformer)
+    seeds = [pescador.Streamer(feature_stream, t, transformer=transformer) for t in tracks]
+    mux_stream = pescador.mux(seeds, max_iter, working_size, lam=n_samples)
 
     # Build the codebook estimator. 
-    encoder = VectorQuantizer(clusterer=HartiganOnline(n_clusters=n_codewords))
-    learn_ooc.fit(encoder, data_stream, batch_size=buffer_size)
-
+    encoder_ = VectorQuantizer(clusterer=HartiganOnline(n_clusters=n_codewords))
+    encoder = pescador.StreamLearner(encoder_, batch_size=buffer_size)
+    encoder.iter_fit(mux_stream)
+    
     return transformer, encoder
 
 if __name__ == '__main__':

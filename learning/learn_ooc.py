@@ -98,6 +98,10 @@ def mux(generators):
             # This one's done.  Remove it from the list.
             generators.pop(i)
 
+            # TODO:   2014-07-03 17:18:36 by Brian McFee <brm2132@columbia.edu>
+            # get a new generator here 
+
+
 def mux_bounded(sample_generator, containers, working_size=10, max_iter=1, shuffle=True, **kwargs):
     '''Generate a sequence by multiplexing a generator function over subsets of data.
     
@@ -131,8 +135,10 @@ def mux_bounded(sample_generator, containers, working_size=10, max_iter=1, shuff
             random.shuffle(idx)
             
         for i in range(0, len(idx), working_size):
+            # Instantiate a new set of generators
             generators = [sample_generator(containers[j], **kwargs) for j in idx[i:i+working_size]]
     
+            # Exhaust the generators
             for x in mux(generators):
                 yield x
 
