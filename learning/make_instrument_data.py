@@ -72,7 +72,7 @@ def build_instrument_data(data_file=None, collection=None, tag_map=None):
 
     inst_tags = load_tag_mapping(tag_map)
 
-    track_ids = seymour.get_collection_tracks(collection, inst_tags)
+    track_ids = seymour.get_collection_tracks(collection)
     
     track_features  = []
     track_names     = []
