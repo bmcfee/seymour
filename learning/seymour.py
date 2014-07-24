@@ -4,6 +4,7 @@
 import mir_eval
 import gordon
 import cPickle as pickle
+import ujson as json
 
 def get_collection_tracks(name):
     """Get all the tracks matching the given collection name"""
@@ -27,6 +28,20 @@ def get_annotation(track_id, annotation='segments', **kwargs):
     annotation_file = track.annotation_dict[annotation]
 
     return mir_eval.io.load_annotation(annotation_file, **kwargs)
+
+def get_tags(track_id, annotation='tags'):
+    '''get a tag dictionary for a given track'''
+    
+    track = get_track(track_id)
+
+    annotation_file = track.annotation_dict[annotation]
+
+    try:
+        tags = json.load(open(annotation_file, 'r'))
+    except:
+        tags = {}
+    
+    return tags
 
 def get_analysis(track_id, analysis='librosa:low-level'):
     '''get the analysis data for a track by id'''
