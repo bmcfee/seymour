@@ -81,9 +81,11 @@ def build_instrument_data(data_file=None, collection=None, tag_map=None):
 
     for t_id in track_ids:
         track = seymour.get_track(t_id)
-        t_f, t_raw, t_inst = get_track_data(t_id, inst_tags)
-        
         track_names.append( (track.artist, track.title) )
+
+        print t_id, track_names[-1]
+
+        t_f, t_raw, t_inst = get_track_data(t_id, inst_tags)
 
         track_features.append(t_f)
         track_raw_tags.append(t_raw)
