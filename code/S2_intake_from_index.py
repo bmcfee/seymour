@@ -52,7 +52,8 @@ log = logging.getLogger('gordon.audio_intake_from_index')
 def track_exists(filename, bytes):
     '''Check to see if a track already exists, using the filename and size'''
 
-    T = Track.query.filter_by(ofilename=filename, bytes=bytes)
+    T = Track.query.filter_by(ofilename=unicode(filename, 'utf-8', errors='ignore'), 
+                              bytes=bytes)
     return T.count() > 0
 
 def add_track(trackpath, source=str(datetime.date.today()),
