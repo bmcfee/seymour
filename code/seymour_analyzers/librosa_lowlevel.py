@@ -104,7 +104,7 @@ def get_beat(y, PARAMETERS):
     odf = librosa.onset.onset_strength(S=S_p, aggregate=np.median)
     
     # Get beats
-    tempo, beats = librosa.beat.beat_track(onsets=odf, 
+    tempo, beats = librosa.beat.beat_track(onset_envelope=odf, 
                                            sr=PARAMETERS['load']['sr'], 
                                            hop_length=PARAMETERS['beat']['hop_length'])
       
