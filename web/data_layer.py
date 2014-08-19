@@ -29,6 +29,36 @@ def get_tracks(collection_id, offset=0, limit=10):
              'artist':      t.artist,
              'album':       t.album} for t in query.all()]
 
+def search_tracks(collection_id=None, rawstr=None, artist=None, title=None, album=None, 
+                  offset=0, limit=10):
+
+    # Initialize the query
+    query = gordon.Track.query
+
+    # Do we have a collection?
+    if collection_id is not None:
+        C = gordon.Collection.query.get(collection_id)
+
+        query = query.filter(gordon.Track.collections.contains(C))
+
+    if rawstr is None:
+        if artist is not None:
+            query = query.filter(gordon.Track.artist.like(u'%%%s%%' % artist))
+        if title is not None:
+            query = query.filter(gordon.Track.title.like(u'%%%s%%' % title))
+        if album is not None:
+            query = query.filter(gordon.Track.album.like(u'%%%s%%' % title))
+    else:
+        query = query.filter(gordon.Track.artist.like(u'%%%s%%' % rawstr) | \
+                             gordon.Track.title.like(u'%%%s%%' % rawstr) | 
+                             gordon.Track.album.like(u'%%%s%%' % rawstr))
+
+    query = query.offset(offset).limit(limit)
+
+    return [{'track_id':    t.id, 
+             'title':       t.title, 
+             'artist':      t.artist,
+             'album':       t.album} for t in query.all()]
 
 #-- track functions
 def get_track_audio(track_id):

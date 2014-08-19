@@ -59,7 +59,8 @@ def get_collections():
 @app.route('/tracks/<int:collection_id>/<int:offset>', defaults={'limit': 12})
 @app.route('/tracks/<int:collection_id>/<int:offset>/<int:limit>')
 def get_tracks(collection_id, offset, limit):
-    limit = min(limit, 48)
+    offset = max(0, offset)
+    limit = max(0, min(limit, 48))
 
     return json.encode(data_layer.get_tracks(collection_id, offset=offset, limit=limit))
 
@@ -68,6 +69,81 @@ def get_tracks(collection_id, offset, limit):
 def index(collection_id):
     '''Top-level web page'''
     return flask.render_template('index.html', collection_id=collection_id)
+
+@app.route('/search/<string:rawstr>', 
+           defaults={'collection_id': None, 
+                     'offset': 0, 
+                     'limit': 10,
+                     'artist': None,
+                     'title': None,
+                     'album': None})
+@app.route('/search/<string:rawstr>/offset/<int:offset>', 
+           defaults={'collection_id': None, 
+                     'limit': 10,
+                     'artist': None,
+                     'title': None,
+                     'album': None})
+@app.route('/search/<string:rawstr>/offset/<int:offset>/limit/<int:limit>', 
+           defaults={'collection_id': None, 
+                     'artist': None,
+                     'title': None,
+                     'album': None})
+@app.route('/search_artist/<string:artist>', 
+           defaults={'collection_id': None, 
+                     'offset': 0, 
+                     'limit': 10,
+                     'title': None,
+                     'album': None})
+@app.route('/search_artist/<string:artist>/offset/<int:offset>', 
+           defaults={'collection_id': None, 
+                     'limit': 10,
+                     'title': None,
+                     'album': None})
+@app.route('/search_artist/<string:artist>/offset/<int:offset>/limit/<int:limit>', 
+           defaults={'collection_id': None, 
+                     'title': None,
+                     'album': None})
+@app.route('/search_title/<string:title>', 
+           defaults={'collection_id': None, 
+                     'offset': 0, 
+                     'limit': 10,
+                     'artist': None,
+                     'album': None})
+@app.route('/search_title/<string:title>/offset/<int:offset>', 
+           defaults={'collection_id': None, 
+                     'limit': 10,
+                     'artist': None,
+                     'album': None})
+@app.route('/search_title/<string:title>/offset/<int:offset>/limit/<int:limit>', 
+           defaults={'collection_id': None, 
+                     'artist': None,
+                     'album': None})
+@app.route('/search_album/<string:album>', 
+           defaults={'collection_id': None, 
+                     'offset': 0, 
+                     'limit': 10,
+                     'title': None,
+                     'artist': None})
+@app.route('/search_album/<string:album>/offset/<int:offset>', 
+           defaults={'collection_id': None, 
+                     'limit': 10,
+                     'title': None,
+                     'artist': None})
+@app.route('/search_album/<string:album>/offset/<int:offset>/limit/<int:limit>', 
+           defaults={'collection_id': None, 
+                     'title': None,
+                     'artist': None})
+def get_search(collection_id=None, rawstr=None, artist=None, title=None, album=None, 
+               offset=0, limit=10):
+    offset = max(0, offset)
+    limit = max(0, min(limit, 48))
+
+    return json.encode(data_layer.search_tracks(collection_id=collection_id, 
+                                                rawstr=rawstr,
+                                                artist=artist,
+                                                title=title,
+                                                album=album,
+                                                offset=offset, limit=limit))
 
 
 #-- partial content streaming
