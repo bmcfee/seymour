@@ -52,13 +52,19 @@ def search_tracks(collection_id=None, rawstr=None, artist=None, title=None, albu
         query = query.filter(gordon.Track.artist.like(u'%%%s%%' % rawstr) | \
                              gordon.Track.title.like(u'%%%s%%' % rawstr) | 
                              gordon.Track.album.like(u'%%%s%%' % rawstr))
+    n = query.count()
 
     query = query.offset(offset).limit(limit)
 
-    return [{'track_id':    t.id, 
+    return {'results': [{'track_id':    t.id, 
              'title':       t.title, 
              'artist':      t.artist,
-             'album':       t.album} for t in query.all()]
+             'collections': [coll.id for coll in t.collections],
+             'album':       t.album} for t in query.all()],
+            'offset': offset,
+            'limit': limit,
+            'count': n}
+
 
 #-- track functions
 def get_track_audio(track_id):

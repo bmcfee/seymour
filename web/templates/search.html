@@ -28,48 +28,36 @@
 
         <nav class="navbar navbar-default" role="navigation">
             <div class="container-fluid">
-                <div class="navbar-form navbar-right">
-                    <a class="btn btn-primary" href="/search">
-                    <span class="glyphicon glyphicon-search"></span>
-                    </a>
-                </div>
                 <div class="navbar-header">
                     <a class="navbar-brand" href="#">Seymour</a>
                 </div>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a  href="#" 
-                                class="dropdown-toggle" 
-                                data-toggle="dropdown">
-                                <span id="collections-count"></span> collections<b class="caret"></b></a>
-                            <ul class="dropdown-menu" id="collections-menu">
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+                <form id="myform" class="navbar-form navbar-right" role="search">
+                    <input class="form-control" type="text" id="query" size="50" placeholder="Miles Davis" autofocus />
+                    <button type="submit" id="search" class="btn btn-default">
+                    <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </form>
             </div>
         </nav>
 
         <div class="container container-fluid col-md-12">
             <div class="row">
-                <div class="panel panel-default">
+                <div class="panel panel-default hidden" id="results">
                     <div class="panel-heading">
-                        <input type="hidden" id="offset" />
-                        <input type="hidden" id="limit" />
-                        <input type="hidden" id="track_count" />
-                        <input type="hidden" id="collection_id" value="{{ collection_id }}" />
+                        <input type="hidden" id="offset" value="0" />
+                        <input type="hidden" id="limit" value="12" />
+                        <input type="hidden" id="track_count" value="0" />
                         <ul class="pager">
-                            <li class="previous"><a href="#">&larr; Previous</a></li>
+                            <li class="previous disabled"><a href="#">&larr; Previous</a></li>
                             <li class="form-group form-inline" id='track-form'> 
                                 <label for="track-min" id="collection-name" class="form-inline"></label> 
-                                <input id="track-min" type="text" class="form-control" style="width: 6em;"> 
+                                <span id="track-min" type="text" class="form-control-static" style="width: 6em;"></span>
                                 <label for="track-max"> to </label> 
                                 <span id="track-max" type="text" class="form-control-static" style="width: 6em;"></span>
                                 of <span id="track-total"></span>
                             </li>
 
-                            <li class="next"><a href="#">Next &rarr;</a></li>
+                            <li class="next disabled"><a href="#">Next &rarr;</a></li>
                         </ul>
                     </div>
                     <div class="panel-body container">
@@ -77,6 +65,9 @@
 
                     </div>
                 </div>
+            </div>
+            <div class="alert alert-danger hidden" id="noresults">
+                No results.
             </div>
         </div>
     </body>
@@ -86,5 +77,5 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
 
-    <script src="/static/js/index.js"></script>
+    <script src="/static/js/search.js"></script>
 </html>

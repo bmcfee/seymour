@@ -70,6 +70,10 @@ def index(collection_id):
     '''Top-level web page'''
     return flask.render_template('index.html', collection_id=collection_id)
 
+@app.route('/search')
+def search():
+    return flask.render_template('search.html')
+
 @app.route('/search/<string:rawstr>', 
            defaults={'collection_id': None, 
                      'offset': 0, 
