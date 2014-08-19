@@ -117,7 +117,7 @@ def add_track(trackpath, source=str(datetime.date.today()),
                   oartist = tag_dict[u'artist'],
                   oalbum = tag_dict[u'album'],
                   otracknum = tag_dict[u'tracknum'],
-                  ofilename = filename,
+                  ofilename = unicode(filename, 'utf-8', errors='ignore'),
                   source = unicode(source),
                   bytes = bytes)
     
