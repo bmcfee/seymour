@@ -11,7 +11,7 @@ def extract_metadata_from_filename(filename, pattern):
     tagdict = dict(title=None, artist=None, album=None, tracknum=-1,
                    compilation=False)
     
-    m = re.match(unicode(pattern, 'utf-8', errors='strict'), unicode(filename, 'utf-8', errors='strict'))
+    m = re.match(unicode(pattern, 'utf-8', errors='strict'), unicode(filename, 'utf-8', errors='ignore'))
     if m:
         for key, val in m.groupdict().iteritems():
             tagdict[key] = val
@@ -26,7 +26,8 @@ def main(pattern=None, output_filename=None, filenames=None):
         print >> sys.stderr, 'Processing %s' % filename
 
         tagdict = extract_metadata_from_filename(filename, pattern)
-        record = {'filepath': unicode(filename, 'utf-8', errors='strict')}
+#         record = {'filepath': unicode(filename, 'utf-8', errors='strict')}
+        record = {'filepath': filename}
 
         for k in keys:
             record[k] = tagdict[k]
@@ -66,7 +67,6 @@ def process_arguments():
     
     parser.add_argument('pattern',
                         action  =   'store',
-                        type    =   unicode,
                         help    =   'Regular expression to match')
 
     parser.add_argument('output_filename',
