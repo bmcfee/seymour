@@ -66,6 +66,7 @@ def process_arguments():
     
     parser.add_argument('pattern',
                         action  =   'store',
+                        type    =   unicode,
                         help    =   'Regular expression to match')
 
     parser.add_argument('output_filename',
