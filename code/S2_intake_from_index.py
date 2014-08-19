@@ -28,11 +28,17 @@ python audio_intake_from_tracklist.py source csv [doit]
 place, only verbose would-dos
 '''
 
-import os, collections, datetime, logging, stat, sys
+import os
+import collections
+import datetime
+import logging
+import stat
+import sys
 
 import argparse
 
 import ujson as json
+import cPickle as pickle
 
 from gordon.io import AudioFile
 from gordon.db.model import add, commit, Album, Artist, Track, Collection, Annotation
@@ -41,7 +47,7 @@ from gordon.db.gordon_db import get_tidfilename, make_subdirs_and_copy, is_binar
 from gordon.io.mp3_eyeD3 import isValidMP3, getAllTags
 
 
-log = logging.getLogger('gordon.audio_intake_from_json')
+log = logging.getLogger('gordon.audio_intake_from_index')
 
 def track_exists(filename, bytes):
     '''Check to see if a track already exists, using the filename and size'''
@@ -169,7 +175,7 @@ def add_track(trackpath, source=str(datetime.date.today()),
     commit() # store the annotations
     log.debug('Added "%s"', trackpath)
 
-def _read_json(cwd, csv=None):
+def _read_file(cwd, csv=None):
     '''Reads a csv file containing track metadata and annotations (v 2.0)
     
     # may use py comments in metadata .csv file. Must include a header:
@@ -193,7 +199,9 @@ def _read_json(cwd, csv=None):
 
     try:
         data = json.load(open(filename, 'r'))
-    except IOError:
+    except ValueError:
+        data = pickle.load(open(filename, 'r'))
+    except:
         log.error("  Couldn't open '%s'", csv)
         raise
     
@@ -297,7 +305,7 @@ def get_or_create_collection(source):
     else:
         return Collection(name=unicode(source))
 
-def add_collection_from_json_file(jsonfile, source=str(datetime.date.today()),
+def add_collection_from_file(input_file, source=str(datetime.date.today()),
                                  prompt_incompletes=False, doit=False,
                                  gordonDir=DEF_GORDON_DIR, fast_import=False,
                                  import_md=False):
@@ -308,7 +316,7 @@ def add_collection_from_json_file(jsonfile, source=str(datetime.date.today()),
 
     Use doit=True to actually commit the addition of songs
     """
-    metadata = _read_json(jsonfile)
+    metadata = _read_file(input_file)
 
     # Turn metadata into a list of albums:
     albums = collections.defaultdict(dict)
@@ -347,7 +355,7 @@ def process_arguments():
                         action  =   'store',
                         help    =   'name for the collection')
 
-    parser.add_argument('jsonfile',
+    parser.add_argument('input_file',
                         action  =   'store',
                         help    =   'path to the track list CSV file')
 
@@ -383,8 +391,8 @@ if __name__ == '__main__':
 
     args = process_arguments()
 
-    log.info('Importing audio from tracklist %s (source=%s)', args['jsonfile'], args['source'])
-    add_collection_from_json_file(  args['jsonfile'], 
+    log.info('Importing audio from tracklist %s (source=%s)', args['input_file'], args['source'])
+    add_collection_from_file(  args['input_file'], 
                                     source=args['source'],
                                     prompt_incompletes=args['prompt_incompletes'],
                                     doit=args['doit'], 
