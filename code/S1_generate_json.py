@@ -5,13 +5,14 @@
 import argparse
 import re
 import sys
-import ujson as json
+#import ujson as json
+import json
 
 def extract_metadata_from_filename(filename, pattern):
     tagdict = dict(title=None, artist=None, album=None, tracknum=-1,
                    compilation=False)
     
-    m = re.match(unicode(pattern,  'utf-8', errors='ignore'), 
+    m = re.match(unicode(pattern,  'utf-8', errors='strict'), 
                  unicode(filename, 'utf-8', errors='ignore'))
     if m:
         for key, val in m.groupdict().iteritems():
@@ -35,7 +36,7 @@ def main(pattern=None, output_filename=None, filenames=None):
         data.append(record)
 
     with open(output_filename, 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, ensure_ascii=False)
     
 def process_arguments():
 
