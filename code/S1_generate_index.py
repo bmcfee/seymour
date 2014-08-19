@@ -5,8 +5,8 @@
 import argparse
 import re
 import sys
-#import ujson as json
-import json
+import ujson as json
+import cPickle as pickle
 
 def extract_metadata_from_filename(filename, pattern):
     tagdict = dict(title=None, artist=None, album=None, tracknum=-1,
@@ -20,7 +20,7 @@ def extract_metadata_from_filename(filename, pattern):
 
     return tagdict
 
-def main(pattern=None, output_filename=None, filenames=None):
+def main(pattern=None, output_filename=None, filenames=None, pickle_file=False):
     keys = ('title', 'artist', 'album', 'tracknum', 'compilation')
 
     data = []
@@ -35,8 +35,17 @@ def main(pattern=None, output_filename=None, filenames=None):
 
         data.append(record)
 
-    with open(output_filename, 'w') as f:
-        json.dump(data, f, ensure_ascii=False)
+    save_data(data, output_filename, pickle_file)
+
+def save_data(data, output_filename, pickle_file):
+
+    if pickle_file:
+        with open(output_filename, 'w') as f:
+            pickle.dump(data, f)
+
+    else:
+        with open(output_filename, 'w') as f:
+            json.dump(data, f, ensure_ascii=False)
     
 def process_arguments():
 
@@ -61,11 +70,20 @@ def process_arguments():
             ~/data/beatles/audio/The\ Beatles/*/*wav
         
         creates tracklist.json
+        
+        Note: If your filenames contain unicode, it may be better to use pickle encoding, rather than json.
+        This can be done by supplying the '-p' command-line argument.
         """
 
     parser = argparse.ArgumentParser(description='Generate a gordon intake file', 
                                      usage=usage)
     
+    parser.add_argument('-p', '--pickle',
+                        dest    =   'pickle_file',
+                        action  =   'store_true',
+                        default =   False,
+                        help    =   'Store results in a pickle file, rather than json')
+
     parser.add_argument('pattern',
                         action  =   'store',
                         help    =   'Regular expression to match')
