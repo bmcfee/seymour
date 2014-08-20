@@ -20,7 +20,7 @@ app.config.from_object(__name__)
 def load_config(server_ini):
     P       = ConfigParser.RawConfigParser()
 
-    P.opionxform    = str
+    P.optionxform    = str
     P.read(server_ini)
 
     CFG = {}
@@ -29,6 +29,7 @@ def load_config(server_ini):
 
     for (k, v) in CFG['server'].iteritems():
         app.config[k] = v
+
     return CFG
 
 def run(**kwargs):
@@ -74,81 +75,15 @@ def index(collection_id):
 def search():
     return flask.render_template('search.html')
 
-@app.route('/search/<string:rawstr>', 
-           defaults={'collection_id': None, 
-                     'offset': 0, 
-                     'limit': 10,
-                     'artist': None,
-                     'title': None,
-                     'album': None})
-@app.route('/search/<string:rawstr>/offset/<int:offset>', 
-           defaults={'collection_id': None, 
-                     'limit': 10,
-                     'artist': None,
-                     'title': None,
-                     'album': None})
-@app.route('/search/<string:rawstr>/offset/<int:offset>/limit/<int:limit>', 
-           defaults={'collection_id': None, 
-                     'artist': None,
-                     'title': None,
-                     'album': None})
-@app.route('/search_artist/<string:artist>', 
-           defaults={'collection_id': None, 
-                     'offset': 0, 
-                     'limit': 10,
-                     'title': None,
-                     'album': None})
-@app.route('/search_artist/<string:artist>/offset/<int:offset>', 
-           defaults={'collection_id': None, 
-                     'limit': 10,
-                     'title': None,
-                     'album': None})
-@app.route('/search_artist/<string:artist>/offset/<int:offset>/limit/<int:limit>', 
-           defaults={'collection_id': None, 
-                     'title': None,
-                     'album': None})
-@app.route('/search_title/<string:title>', 
-           defaults={'collection_id': None, 
-                     'offset': 0, 
-                     'limit': 10,
-                     'artist': None,
-                     'album': None})
-@app.route('/search_title/<string:title>/offset/<int:offset>', 
-           defaults={'collection_id': None, 
-                     'limit': 10,
-                     'artist': None,
-                     'album': None})
-@app.route('/search_title/<string:title>/offset/<int:offset>/limit/<int:limit>', 
-           defaults={'collection_id': None, 
-                     'artist': None,
-                     'album': None})
-@app.route('/search_album/<string:album>', 
-           defaults={'collection_id': None, 
-                     'offset': 0, 
-                     'limit': 10,
-                     'title': None,
-                     'artist': None})
-@app.route('/search_album/<string:album>/offset/<int:offset>', 
-           defaults={'collection_id': None, 
-                     'limit': 10,
-                     'title': None,
-                     'artist': None})
-@app.route('/search_album/<string:album>/offset/<int:offset>/limit/<int:limit>', 
-           defaults={'collection_id': None, 
-                     'title': None,
-                     'artist': None})
-def get_search(collection_id=None, rawstr=None, artist=None, title=None, album=None, 
-               offset=0, limit=10):
+
+@app.route('/search/<string:query>', defaults={'offset': 0, 'limit': 12})
+@app.route('/search/<string:query>/<int:offset>', defaults={'limit': 12})
+@app.route('/search/<string:query>/<int:offset>/<int:limit>')
+def fulltext_search(query='', offset=0, limit=12):
     offset = max(0, offset)
     limit = max(0, min(limit, 48))
 
-    return json.encode(data_layer.search_tracks(collection_id=collection_id, 
-                                                rawstr=rawstr,
-                                                artist=artist,
-                                                title=title,
-                                                album=album,
-                                                offset=offset, limit=limit))
-
+    return json.encode(data_layer.whoosh_search(query, offset, limit))
 
 #-- partial content streaming
 
@@ -233,6 +168,9 @@ if __name__ == '__main__':
     parameters = process_arguments()
 
     CFG = load_config(parameters['ini'])
+
+
+    data_layer.open_index(app.config['whoosh'])
 
     port = parameters['port']
 

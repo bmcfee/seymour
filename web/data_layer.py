@@ -4,6 +4,13 @@ import gordon
 import numpy as np
 import cPickle as pickle
 
+import whoosh
+import whoosh.index
+import whoosh.qparser
+import whoosh.query
+
+index = None
+
 #-- collection functions
 def get_collections():
     return [{'collection_id': c.id, 
@@ -64,6 +71,53 @@ def search_tracks(collection_id=None, rawstr=None, artist=None, title=None, albu
             'offset': offset,
             'limit': limit,
             'count': n}
+
+def open_index(index_path):
+
+    global index
+    index = whoosh.index.open_dir(index_path)
+    pass
+
+def whoosh_search(qstr, offset=0, limit=10):
+
+    global index
+    
+    n = 0
+    search_results = []
+
+    parser = whoosh.qparser.MultifieldParser(['title', 
+                                              'artist', 
+                                              'album'],
+                                             index.schema)
+    query = parser.parse(qstr)
+    
+    print query
+
+    if qstr:
+        with index.searcher() as searcher:
+            
+            rs = searcher.search(query, limit=offset+limit)
+            n = rs.estimated_length()
+            for i, result in enumerate(rs):
+                if i < offset:
+                    continue
+    
+                if i >= limit+offset:
+                    break
+    
+                sr = {'title': '', 'album': '', 'artist': '', 'track_id': ''}
+
+                sr.update(dict(result))
+                sr['collections'] = [sr['collection_id']]
+                del sr['collection_id']
+                del sr['collection']
+                
+                search_results.append(sr)
+
+    return {'count': n, 
+            'offset': offset,
+            'limit': limit, 
+            'results': search_results}
 
 
 #-- track functions

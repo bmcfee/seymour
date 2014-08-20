@@ -52,7 +52,7 @@ function search(offset, limit) {
     limit  = parseInt(limit);
 
     // First update the collection container
-    $.ajax({url: '/search/' + $('#query').val() + '/offset/' + offset + '/limit/' + limit,
+    $.ajax({url: '/search/' + $('#query').val() + '/' + offset + '/' + limit,
             dataType: 'json'}).done(function(data) {
 
             $("#tracklist > *").remove();
