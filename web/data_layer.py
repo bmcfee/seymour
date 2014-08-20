@@ -36,42 +36,6 @@ def get_tracks(collection_id, offset=0, limit=10):
              'artist':      t.artist,
              'album':       t.album} for t in query.all()]
 
-def search_tracks(collection_id=None, rawstr=None, artist=None, title=None, album=None, 
-                  offset=0, limit=10):
-
-    # Initialize the query
-    query = gordon.Track.query
-
-    # Do we have a collection?
-    if collection_id is not None:
-        C = gordon.Collection.query.get(collection_id)
-
-        query = query.filter(gordon.Track.collections.contains(C))
-
-    if rawstr is None:
-        if artist is not None:
-            query = query.filter(gordon.Track.artist.like(u'%%%s%%' % artist))
-        if title is not None:
-            query = query.filter(gordon.Track.title.like(u'%%%s%%' % title))
-        if album is not None:
-            query = query.filter(gordon.Track.album.like(u'%%%s%%' % title))
-    else:
-        query = query.filter(gordon.Track.artist.like(u'%%%s%%' % rawstr) | \
-                             gordon.Track.title.like(u'%%%s%%' % rawstr) | 
-                             gordon.Track.album.like(u'%%%s%%' % rawstr))
-    n = query.count()
-
-    query = query.offset(offset).limit(limit)
-
-    return {'results': [{'track_id':    t.id, 
-             'title':       t.title, 
-             'artist':      t.artist,
-             'collections': [coll.id for coll in t.collections],
-             'album':       t.album} for t in query.all()],
-            'offset': offset,
-            'limit': limit,
-            'count': n}
-
 def open_index(index_path):
 
     global index
@@ -88,11 +52,12 @@ def whoosh_search(qstr, offset=0, limit=10):
     parser = whoosh.qparser.MultifieldParser(['title', 
                                               'artist', 
                                               'album'],
-                                             index.schema)
+                                             index.schema,
+                                             group=whoosh.qparser.OrGroup)
+    parser.add_plugin(whoosh.qparser.EveryPlugin())
+
     query = parser.parse(qstr)
     
-    print query
-
     if qstr:
         with index.searcher() as searcher:
             

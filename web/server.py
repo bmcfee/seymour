@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import ujson as json
+import urllib2
 
 import data_layer
 
@@ -76,13 +77,14 @@ def search():
     return flask.render_template('search.html')
 
 
-@app.route('/search/<string:query>', defaults={'offset': 0, 'limit': 12})
-@app.route('/search/<string:query>/<int:offset>', defaults={'limit': 12})
-@app.route('/search/<string:query>/<int:offset>/<int:limit>')
-def fulltext_search(query='', offset=0, limit=12):
+@app.route('/search/<path:query>', defaults={'offset': 0, 'limit': 12})
+@app.route('/search/<path:query>/<int:offset>', defaults={'limit': 12})
+@app.route('/search/<path:query>/<int:offset>/<int:limit>')
+def fulltext_search(query=u'', offset=0, limit=12):
     offset = max(0, offset)
     limit = max(0, min(limit, 48))
 
+    query = urllib2.unquote(query)
     return json.encode(data_layer.whoosh_search(query, offset, limit))
 
 #-- partial content streaming
