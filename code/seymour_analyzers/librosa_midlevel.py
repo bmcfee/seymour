@@ -120,7 +120,7 @@ def get_repetition_features(X, n_steps, metric, width, kernel_size, n_factors):
     '''Construct latent repetition features'''
 
     # First, stack up by history
-    X = librosa.segment.stack_memory(X, n_steps=n_steps)
+    X = librosa.feature.stack_memory(X, n_steps=n_steps)
 
     # Then build the recurrence matrix
     R = librosa.segment.recurrence_matrix(X, 
