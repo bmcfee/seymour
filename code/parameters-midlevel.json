@@ -19,7 +19,7 @@
                         "min_seg":          10.0,
                         "max_seg":          45.0},
 
- "encoder":        {    "transformation":   "../models/vq_codebook.npy",
+ "encoder":        {    "transformation":   "../models/vq_log-mel-delta_cal10k.pickle",
                         "n_quantizers":     8}
 
 }
