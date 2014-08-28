@@ -2,3 +2,6 @@
 root=.
 static=static
 whoosh=./fulltext
+BASIC_AUTH_FORCE=True
+BASIC_AUTH_USERNAME=
+BASIC_AUTH_PASSWORD=
