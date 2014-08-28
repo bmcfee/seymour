@@ -49,9 +49,13 @@ def whoosh_search(qstr, offset=0, limit=10):
     n = 0
     search_results = []
 
+#     TODO:   2014-08-28 14:02:01 by Brian McFee <brm2132@columbia.edu>
+# add collection name search 
+
     parser = whoosh.qparser.MultifieldParser(['title', 
                                               'artist', 
-                                              'album'],
+                                              'album',
+                                              'collection'],
                                              index.schema,
                                              group=whoosh.qparser.OrGroup)
     parser.add_plugin(whoosh.qparser.EveryPlugin())
