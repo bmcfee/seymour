@@ -88,6 +88,11 @@ def get_neighbors(X, k, width, metric):
 def compress_features(X, k):
     '''Compress the columns of X down to k dimensions'''
     
+    # If we don't have enough data to estimate a covariance matrix,
+    # just return zeros
+    if X.shape[1] < X.shape[0]:
+        return np.zeros( (k, X.shape[1]) )
+
     sigma = np.cov(X)
     e_vals, e_vecs = scipy.linalg.eig(sigma)
         
@@ -210,7 +215,7 @@ def get_segment_range(duration, min_seg, max_seg):
     '''Get the range of reasonable values for the segment tree pruning'''
 
     k_min = max(1, np.floor(float(duration) / max_seg))
-    k_max = max(2, np.ceil(float(duration) / min_seg))
+    k_max = max(1, np.ceil(float(duration) / min_seg))
 
     return int(k_min), int(k_max)
 
