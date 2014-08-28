@@ -10,6 +10,8 @@ import sys
 import ujson as json
 import urllib2
 
+from flask.ext.basicauth import BasicAuth
+
 import data_layer
 
 DEBUG = True
@@ -179,6 +181,7 @@ if __name__ == '__main__':
     if os.environ.get('ENV') == 'production':
         port = int(os.environ.get('PORT'))
 
+    auth = BasicAuth(app)
     run(host=parameters['host'], port=port, debug=DEBUG, processes=3)
 
 
